@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Opérations</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a, #1e40af);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .table th {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            font-weight: 600;
+            border: none;
+            color: #495057;
+        }
+        .btn-group-sm .btn {
+            border-radius: 6px;
+            margin: 0 1px;
+        }
+        .icon-container {
+            opacity: 0.3;
+            font-size: 2.5rem;
+        }
+        .logo-container {
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .loading-spinner.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <i class="fas fa-anchor fa-2x text-white mb-2"></i>
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship me-2"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor me-2"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="operations.html">
+                                <i class="fas fa-cogs me-2"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users me-2"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie me-2"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock me-2"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container me-2"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box me-2"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper me-2"></i> Arrêts
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="mt-auto p-3">
+                        <button class="btn btn-danger btn-sm w-100" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-cogs me-2 text-primary"></i>Gestion des Opérations</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addOperationModal">
+                                <i class="fas fa-plus me-1"></i> Nouvelle Opération
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alertes -->
+                    <div id="alertContainer"></div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Opérations totales</h6>
+                                            <h2 class="my-2" id="statTotal">0</h2>
+                                            <p class="card-text mb-0">
+                                                <small>toutes opérations</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-cogs"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">En cours</h6>
+                                            <h2 class="my-2" id="statEnCours">0</h2>
+                                            <p class="card-text mb-0">
+                                                <small>opérations actives</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-play-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Terminées</h6>
+                                            <h2 class="my-2" id="statTerminees">0</h2>
+                                            <p class="card-text mb-0">
+                                                <small>opérations finies</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">En attente</h6>
+                                            <h2 class="my-2" id="statEnAttente">0</h2>
+                                            <p class="card-text mb-0">
+                                                <small>en planification</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="filterForm">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label for="searchId" class="form-label">ID Opération</label>
+                                        <input type="text" class="form-control" id="searchId" placeholder="Ex: OP-001">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchType" class="form-label">Type</label>
+                                        <select class="form-select" id="searchType">
+                                            <option value="">Tous les types</option>
+                                            <option value="Chargement">Chargement</option>
+                                            <option value="Déchargement">Déchargement</option>
+                                            <option value="Transbordement">Transbordement</option>
+                                            <option value="Stockage">Stockage</option>
+                                            <option value="Manutention">Manutention</option>
+                                            <option value="Inspection">Inspection</option>
+                                            <option value="Nettoyage">Nettoyage</option>
+                                            <option value="Maintenance">Maintenance</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchStatus" class="form-label">Statut</label>
+                                        <select class="form-select" id="searchStatus">
+                                            <option value="">Tous les statuts</option>
+                                            <option value="En attente">En attente</option>
+                                            <option value="En cours">En cours</option>
+                                            <option value="Terminée">Terminée</option>
+                                            <option value="Suspendue">Suspendue</option>
+                                            <option value="Annulée">Annulée</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchEscale" class="form-label">Escale</label>
+                                        <select class="form-select" id="searchEscale">
+                                            <option value="">Toutes les escales</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchEquipe" class="form-label">Équipe</label>
+                                        <select class="form-select" id="searchEquipe">
+                                            <option value="">Toutes les équipes</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchGlobal" class="form-label">Recherche globale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchGlobal" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" onclick="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des opérations -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Opérations</h5>
+                            <span class="badge bg-primary" id="totalOperations">Total: 0 opérations</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0" id="operationsTable">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-hashtag me-1"></i>ID</th>
+                                            <th><i class="fas fa-tag me-1"></i>Type</th>
+                                            <th><i class="fas fa-anchor me-1"></i>Escale</th>
+                                            <th><i class="fas fa-ship me-1"></i>Navire</th>
+                                            <th><i class="fas fa-users me-1"></i>Équipe</th>
+                                            <th><i class="fas fa-play me-1"></i>Date Début</th>
+                                            <th><i class="fas fa-stop me-1"></i>Date Fin</th>
+                                            <th><i class="fas fa-info-circle me-1"></i>Statut</th>
+                                            <th><i class="fas fa-hand-paper me-1"></i>Arrêts</th>
+                                            <th><i class="fas fa-tools me-1"></i>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="operationsTableBody">
+                                        <tr class="loading-spinner">
+                                            <td colspan="10" class="text-center py-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                                <p class="mt-2 text-muted">Chargement des opérations...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Pagination -->
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div id="paginationInfo">
+                                <span>Affichage 0 à 0 sur 0 résultats</span>
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0" id="pagination">
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Opération -->
+    <div class="modal fade" id="addOperationModal" tabindex="-1" aria-labelledby="addOperationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addOperationModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Nouvelle Opération
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addOperationForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Type d'opération *</label>
+                                <select class="form-select" name="type" required>
+                                    <option value="">Sélectionnez un type</option>
+                                    <option value="Chargement">Chargement</option>
+                                    <option value="Déchargement">Déchargement</option>
+                                    <option value="Transbordement">Transbordement</option>
+                                    <option value="Stockage">Stockage</option>
+                                    <option value="Manutention">Manutention</option>
+                                    <option value="Inspection">Inspection</option>
+                                    <option value="Nettoyage">Nettoyage</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select" name="status">
+                                    <option value="En attente">En attente</option>
+                                    <option value="En cours">En cours</option>
+                                    <option value="Terminée">Terminée</option>
+                                    <option value="Suspendue">Suspendue</option>
+                                    <option value="Annulée">Annulée</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Escale *</label>
+                                <select class="form-select" name="escale" required>
+                                    <option value="">Sélectionnez une escale</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Navire</label>
+                                <input type="text" class="form-control" name="navire" readonly placeholder="Sélectionnez d'abord une escale">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Équipe *</label>
+                                <select class="form-select" name="equipe" required>
+                                    <option value="">Sélectionnez une équipe</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Shift</label>
+                                <select class="form-select" name="shift">
+                                    <option value="">Sélectionnez un shift</option>
+                                    <option value="SH-001">Shift Matin (06:00-14:00)</option>
+                                    <option value="SH-002">Shift Après-midi (14:00-22:00)</option>
+                                    <option value="SH-003">Shift Nuit (22:00-06:00)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date de début</label>
+                                <input type="datetime-local" class="form-control" name="dateDebut">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date de fin</label>
+                                <input type="datetime-local" class="form-control" name="dateFin">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveOperation()">
+                        <i class="fas fa-save me-1"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let operations = [];
+        let filteredOperations = [];
+        let escales = [];
+        let equipes = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        const API_BASE_URL = 'api/';
+
+        // Données de démonstration
+        const demoOperations = [
+            {
+                ID_operation: 'OP-001',
+                TYPE_operation: 'Chargement',
+                ID_escale: 'ESC-001',
+                NOM_navire: 'MSC MARINA',
+                NOM_equipe: 'Équipe Alpha',
+                DATE_debut: '2024-01-15T08:00:00',
+                DATE_fin: '2024-01-15T12:00:00',
+                status: 'Terminée',
+                NOMBRE_ARRETS: 2
+            },
+            {
+                ID_operation: 'OP-002',
+                TYPE_operation: 'Déchargement',
+                ID_escale: 'ESC-002',
+                NOM_navire: 'EVER GIVEN',
+                NOM_equipe: 'Équipe Beta',
+                DATE_debut: '2024-01-15T14:00:00',
+                DATE_fin: null,
+                status: 'En cours',
+                NOMBRE_ARRETS: 1
+            },
+            {
+                ID_operation: 'OP-003',
+                TYPE_operation: 'Inspection',
+                ID_escale: 'ESC-003',
+                NOM_navire: 'OOCL TOKYO',
+                NOM_equipe: 'Équipe Gamma',
+                DATE_debut: null,
+                DATE_fin: null,
+                status: 'En attente',
+                NOMBRE_ARRETS: 0
+            }
+        ];
+
+        const demoEscales = [
+            { NUM_escale: 'ESC-001', NOM_navire: 'MSC MARINA', PORT_ORIGINE: 'Le Havre' },
+            { NUM_escale: 'ESC-002', NOM_navire: 'EVER GIVEN', PORT_ORIGINE: 'Rotterdam' },
+            { NUM_escale: 'ESC-003', NOM_navire: 'OOCL TOKYO', PORT_ORIGINE: 'Hambourg' },
+            { NUM_escale: 'ESC-004', NOM_navire: 'MAERSK ALABAMA', PORT_ORIGINE: 'Anvers' },
+            { NUM_escale: 'ESC-005', NOM_navire: 'CMA CGM MARCO POLO', PORT_ORIGINE: 'Marseille' }
+        ];
+
+        const demoEquipes = [
+            { ID_equipe: 'EQ-001', NOM_equipe: 'Équipe Alpha', CHEF_EQUIPE: 'Jean Dupont' },
+            { ID_equipe: 'EQ-002', NOM_equipe: 'Équipe Beta', CHEF_EQUIPE: 'Marie Martin' },
+            { ID_equipe: 'EQ-003', NOM_equipe: 'Équipe Gamma', CHEF_EQUIPE: 'Pierre Durand' },
+            { ID_equipe: 'EQ-004', NOM_equipe: 'Équipe Delta', CHEF_EQUIPE: 'Sophie Leblanc' },
+            { ID_equipe: 'EQ-005', NOM_equipe: 'Équipe Epsilon', CHEF_EQUIPE: 'Marc Rousseau' }
+        ];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+            setupEventListeners();
+        });
+
+        // Charger toutes les données
+        async function loadAllData() {
+            await Promise.all([
+                loadOperations(),
+                loadEscales(),
+                loadEquipes()
+            ]);
+            populateFilterSelects();
+            populateModalSelects();
+        }
+
+        // Configuration des événements
+        function setupEventListeners() {
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                filterOperations();
+            });
+
+            // Événement pour changement d'escale dans le modal
+            const escaleSelect = document.querySelector('#addOperationModal select[name="escale"]');
+            if (escaleSelect) {
+                escaleSelect.addEventListener('change', function() {
+                    updateNavireField(this.value);
+                });
+            }
+        }
+
+        // Charger les escales
+        async function loadEscales() {
+            try {
+                const response = await fetch(API_BASE_URL + 'escales.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    escales = data.records;
+                } else {
+                    throw new Error('API Error');
+                }
+            } catch (error) {
+                console.log('Utilisation des données de démonstration pour les escales');
+                escales = demoEscales;
+            }
+        }
+
+        // Charger les équipes
+        async function loadEquipes() {
+            try {
+                const response = await fetch(API_BASE_URL + 'equipes.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    equipes = data.records;
+                } else {
+                    throw new Error('API Error');
+                }
+            } catch (error) {
+                console.log('Utilisation des données de démonstration pour les équipes');
+                equipes = demoEquipes;
+            }
+        }
+
+        // Peupler les sélecteurs de filtres
+        function populateFilterSelects() {
+            // Escales dans les filtres
+            const searchEscaleSelect = document.getElementById('searchEscale');
+            searchEscaleSelect.innerHTML = '<option value="">Toutes les escales</option>';
+            escales.forEach(escale => {
+                const option = document.createElement('option');
+                option.value = escale.NUM_escale;
+                option.textContent = `${escale.NUM_escale} - ${escale.NOM_navire}`;
+                searchEscaleSelect.appendChild(option);
+            });
+
+            // Équipes dans les filtres
+            const searchEquipeSelect = document.getElementById('searchEquipe');
+            searchEquipeSelect.innerHTML = '<option value="">Toutes les équipes</option>';
+            equipes.forEach(equipe => {
+                const option = document.createElement('option');
+                option.value = equipe.ID_equipe;
+                option.textContent = equipe.NOM_equipe;
+                searchEquipeSelect.appendChild(option);
+            });
+        }
+
+        // Peupler les sélecteurs du modal
+        function populateModalSelects() {
+            // Escales dans le modal
+            const modalEscaleSelect = document.querySelector('#addOperationModal select[name="escale"]');
+            if (modalEscaleSelect) {
+                modalEscaleSelect.innerHTML = '<option value="">Sélectionnez une escale</option>';
+                escales.forEach(escale => {
+                    const option = document.createElement('option');
+                    option.value = escale.NUM_escale;
+                    option.textContent = `${escale.NUM_escale} - ${escale.NOM_navire}`;
+                    option.dataset.navire = escale.NOM_navire;
+                    modalEscaleSelect.appendChild(option);
+                });
+            }
+
+            // Équipes dans le modal
+            const modalEquipeSelect = document.querySelector('#addOperationModal select[name="equipe"]');
+            if (modalEquipeSelect) {
+                modalEquipeSelect.innerHTML = '<option value="">Sélectionnez une équipe</option>';
+                equipes.forEach(equipe => {
+                    const option = document.createElement('option');
+                    option.value = equipe.ID_equipe;
+                    option.textContent = `${equipe.NOM_equipe}${equipe.CHEF_EQUIPE ? ' (' + equipe.CHEF_EQUIPE + ')' : ''}`;
+                    modalEquipeSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Mettre à jour le champ navire quand l'escale change
+        function updateNavireField(escaleId) {
+            const navireField = document.querySelector('#addOperationModal input[name="navire"]');
+            if (navireField) {
+                const escale = escales.find(e => e.NUM_escale === escaleId);
+                navireField.value = escale ? escale.NOM_navire : '';
+            }
+        }
+
+        // Charger les opérations
+        async function loadOperations() {
+            try {
+                const response = await fetch(API_BASE_URL + 'operations.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    operations = data.records;
+                } else {
+                    throw new Error('API Error');
+                }
+            } catch (error) {
+                console.log('Utilisation des données de démonstration');
+                operations = demoOperations;
+            }
+            
+            filteredOperations = [...operations];
+            updateStatistics();
+            renderOperations();
+            hideLoading();
+        }
+
+        // Cacher le loading
+        function hideLoading() {
+            const spinner = document.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStatistics() {
+            const stats = {
+                total: operations.length,
+                enCours: operations.filter(op => op.status === 'En cours').length,
+                terminees: operations.filter(op => op.status === 'Terminée').length,
+                enAttente: operations.filter(op => op.status === 'En attente').length
+            };
+
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statEnCours').textContent = stats.enCours;
+            document.getElementById('statTerminees').textContent = stats.terminees;
+            document.getElementById('statEnAttente').textContent = stats.enAttente;
+        }
+
+        // Filtrer les opérations
+        function filterOperations() {
+            const searchId = document.getElementById('searchId').value.toLowerCase();
+            const searchType = document.getElementById('searchType').value;
+            const searchStatus = document.getElementById('searchStatus').value;
+            const searchEscale = document.getElementById('searchEscale').value;
+            const searchEquipe = document.getElementById('searchEquipe').value;
+            const searchGlobal = document.getElementById('searchGlobal').value.toLowerCase();
+
+            filteredOperations = operations.filter(operation => {
+                let match = true;
+
+                if (searchId) {
+                    match = match && operation.ID_operation.toLowerCase().includes(searchId);
+                }
+                if (searchType) {
+                    match = match && operation.TYPE_operation === searchType;
+                }
+                if (searchStatus) {
+                    match = match && operation.status === searchStatus;
+                }
+                if (searchEscale) {
+                    match = match && operation.ID_escale === searchEscale;
+                }
+                if (searchEquipe) {
+                    match = match && operation.ID_equipe === searchEquipe;
+                }
+                if (searchGlobal) {
+                    match = match && (
+                        operation.ID_operation.toLowerCase().includes(searchGlobal) ||
+                        operation.TYPE_operation.toLowerCase().includes(searchGlobal) ||
+                        (operation.NOM_navire && operation.NOM_navire.toLowerCase().includes(searchGlobal)) ||
+                        (operation.NOM_equipe && operation.NOM_equipe.toLowerCase().includes(searchGlobal))
+                    );
+                }
+
+                return match;
+            });
+
+            currentPage = 1;
+            renderOperations();
+        }
+
+        // Réinitialiser les filtres
+        function resetFilters() {
+            document.getElementById('filterForm').reset();
+            filteredOperations = [...operations];
+            currentPage = 1;
+            renderOperations();
+        }
+
+        // Rendre les opérations
+        function renderOperations() {
+            const tbody = document.getElementById('operationsTableBody');
+            const totalOperations = document.getElementById('totalOperations');
+            
+            // Mettre à jour le compteur
+            totalOperations.textContent = `Total: ${filteredOperations.length} opérations`;
+
+            // Pagination
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const displayedOperations = filteredOperations.slice(start, end);
+
+            // Vider le tableau
+            tbody.innerHTML = '';
+
+            if (displayedOperations.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="text-center py-4">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucune opération trouvée</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Rendre chaque opération
+            displayedOperations.forEach(operation => {
+                const row = document.createElement('tr');
+                row.className = 'align-middle';
+                row.innerHTML = `
+                    <td><strong>${operation.ID_operation}</strong></td>
+                    <td>
+                        <i class="${getOperationIcon(operation.TYPE_operation)} me-2 text-primary"></i>
+                        ${operation.TYPE_operation}
+                    </td>
+                    <td>${operation.ID_escale}</td>
+                    <td>${operation.NOM_navire || '-'}</td>
+                    <td>${operation.NOM_equipe || '-'}</td>
+                    <td>${formatDate(operation.DATE_debut)}</td>
+                    <td>${formatDate(operation.DATE_fin)}</td>
+                    <td>
+                        <span class="badge ${getStatusBadgeClass(operation.status)}">
+                            ${operation.status}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">${operation.NOMBRE_ARRETS || 0}</span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-success" onclick="viewOperationDetail('${operation.ID_operation}')" title="Voir détails">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="viewOperation('${operation.ID_operation}')" title="Aperçu">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="editOperation('${operation.ID_operation}')" title="Modifier">
+                                <i class="fas fa-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteOperation('${operation.ID_operation}')" title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Mettre à jour la pagination
+            updatePagination();
+        }
+
+        // Mettre à jour la pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredOperations.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, filteredOperations.length);
+
+            // Info pagination
+            document.getElementById('paginationInfo').innerHTML = 
+                `<span>Affichage ${start} à ${end} sur ${filteredOperations.length} résultats</span>`;
+
+            // Boutons pagination
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // Bouton précédent
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `
+                <button class="page-link" onclick="setPage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+            pagination.appendChild(prevLi);
+
+            // Numéros de pages
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<button class="page-link" onclick="setPage(${i})">${i}</button>`;
+                pagination.appendChild(li);
+            }
+
+            // Bouton suivant
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `
+                <button class="page-link" onclick="setPage(${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            pagination.appendChild(nextLi);
+        }
+
+        // Changer de page
+        function setPage(page) {
+            const totalPages = Math.ceil(filteredOperations.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderOperations();
+            }
+        }
+
+        // Utilitaires de formatage
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('fr-FR');
+        }
+
+        function getOperationIcon(type) {
+            const icons = {
+                'Chargement': 'fas fa-upload',
+                'Déchargement': 'fas fa-download',
+                'Transbordement': 'fas fa-exchange-alt',
+                'Stockage': 'fas fa-warehouse',
+                'Manutention': 'fas fa-hands-helping',
+                'Inspection': 'fas fa-search',
+                'Nettoyage': 'fas fa-broom',
+                'Maintenance': 'fas fa-tools'
+            };
+            return icons[type] || 'fas fa-cogs';
+        }
+
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'En cours': 'bg-primary',
+                'Terminée': 'bg-success',
+                'En attente': 'bg-warning',
+                'Suspendue': 'bg-info',
+                'Annulée': 'bg-danger'
+            };
+            return classes[status] || 'bg-secondary';
+        }
+
+        // Actions sur les opérations
+        function viewOperationDetail(id) {
+            window.location.href = `operation-detail.html?id=${id}`;
+        }
+
+        function viewOperation(id) {
+            const operation = operations.find(op => op.ID_operation === id);
+            if (operation) {
+                showAlert(`Aperçu de l'opération ${id}: ${operation.TYPE_operation} - ${operation.status}`, 'info');
+            }
+        }
+
+        function editOperation(id) {
+            const operation = operations.find(op => op.ID_operation === id);
+            if (operation) {
+                showAlert(`Modification de l'opération ${id} (fonctionnalité à implémenter)`, 'info');
+            }
+        }
+
+        function deleteOperation(id) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer l'opération ${id} ?`)) {
+                operations = operations.filter(op => op.ID_operation !== id);
+                filteredOperations = filteredOperations.filter(op => op.ID_operation !== id);
+                updateStatistics();
+                renderOperations();
+                showAlert(`Opération ${id} supprimée avec succès`, 'success');
+            }
+        }
+
+        // Sauvegarder une opération dans la BDD
+        async function saveOperation() {
+            const form = document.getElementById('addOperationForm');
+            const formData = new FormData(form);
+            
+            // Validation détaillée
+            const type = formData.get('type');
+            const escale = formData.get('escale');
+            const equipe = formData.get('equipe');
+            
+            if (!type) {
+                showAlert('Veuillez sélectionner un type d\'opération', 'warning');
+                return;
+            }
+            
+            if (!escale) {
+                showAlert('Veuillez sélectionner une escale', 'warning');
+                return;
+            }
+            
+            if (!equipe) {
+                showAlert('Veuillez sélectionner une équipe', 'warning');
+                return;
+            }
+
+            // Préparer les données pour l'API
+            const operationData = {
+                type_operation: type,
+                id_shift: formData.get('shift') || null,
+                id_escale: escale,
+                id_conteneure: formData.get('conteneurs') || null,
+                id_engin: formData.get('engins') || null,
+                id_equipe: equipe,
+                date_debut: formData.get('dateDebut') || null,
+                date_fin: formData.get('dateFin') || null,
+                status: formData.get('status') || 'En attente'
+            };
+
+            console.log('Envoi des données à l\'API:', operationData);
+
+            try {
+                // Appel à l'API pour sauvegarder réellement en BDD
+                const response = await fetch(API_BASE_URL + 'operations.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(operationData)
+                });
+
+                const result = await response.json();
+                console.log('Réponse de l\'API:', result);
+
+                if (result.success) {
+                    // Succès - recharger les données depuis la BDD
+                    showAlert(`Opération ${result.id_operation || 'nouvelle'} créée avec succès dans la base de données`, 'success');
+                    
+                    // Recharger les opérations depuis la BDD
+                    await loadOperations();
+                    
+                    // Fermer le modal et réinitialiser le formulaire
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addOperationModal'));
+                    modal.hide();
+                    form.reset();
+                    
+                    // Remettre le placeholder du navire
+                    const navireField = document.querySelector('#addOperationModal input[name="navire"]');
+                    if (navireField) {
+                        navireField.placeholder = 'Sélectionnez d\'abord une escale';
+                        navireField.value = '';
+                    }
+                } else {
+                    // Erreur API
+                    showAlert('Erreur API: ' + (result.message || 'Erreur inconnue'), 'danger');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'appel API:', error);
+                
+                // En cas d'erreur API, créer une opération locale comme fallback
+                showAlert('Erreur de connexion à l\'API. Création d\'une opération locale.', 'warning');
+                
+                // Récupérer les informations complémentaires
+                const selectedEscale = escales.find(e => e.NUM_escale === escale);
+                const selectedEquipe = equipes.find(e => e.ID_equipe === equipe);
+
+                // Simulation d'ajout avec données réalistes (fallback)
+                const newOperation = {
+                    ID_operation: `OP-${String(operations.length + 1).padStart(3, '0')}`,
+                    TYPE_operation: type,
+                    ID_escale: escale,
+                    NOM_navire: selectedEscale ? selectedEscale.NOM_navire : 'Navire Inconnu',
+                    NOM_equipe: selectedEquipe ? selectedEquipe.NOM_equipe : 'Équipe Inconnue',
+                    ID_equipe: equipe,
+                    DATE_debut: formData.get('dateDebut') || null,
+                    DATE_fin: formData.get('dateFin') || null,
+                    status: formData.get('status') || 'En attente',
+                    NOMBRE_ARRETS: 0
+                };
+
+                console.log('Opération locale créée:', newOperation);
+
+                operations.push(newOperation);
+                filteredOperations = [...operations];
+                updateStatistics();
+                renderOperations();
+                
+                // Fermer le modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addOperationModal'));
+                modal.hide();
+                form.reset();
+                
+                // Remettre le placeholder du navire
+                const navireField = document.querySelector('#addOperationModal input[name="navire"]');
+                if (navireField) {
+                    navireField.placeholder = 'Sélectionnez d\'abord une escale';
+                    navireField.value = '';
+                }
+                
+                showAlert(`Opération locale ${newOperation.ID_operation} créée (non synchronisée avec la BDD)`, 'info');
+            }
+        }
+
+        // Système d'alertes
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            alertContainer.appendChild(alertDiv);
+
+            // Auto-suppression après 5 secondes
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Export des données
+        function exportData() {
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "ID,Type,Escale,Navire,Equipe,Statut,Date Debut,Date Fin,Arrets\n"
+                + filteredOperations.map(operation => {
+                    return [
+                        operation.ID_operation,
+                        operation.TYPE_operation,
+                        operation.ID_escale,
+                        operation.NOM_navire || 'Navire inconnu',
+                        operation.NOM_equipe || 'Équipe inconnue',
+                        operation.status,
+                        formatDate(operation.DATE_debut),
+                        formatDate(operation.DATE_fin),
+                        operation.NOMBRE_ARRETS || 0
+                    ].join(',');
+                }).join('\n');
+                
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "operations_" + new Date().toISOString().slice(0, 10) + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Données exportées avec succès', 'success');
+        }
+
+        // Déconnexion
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userInfo');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

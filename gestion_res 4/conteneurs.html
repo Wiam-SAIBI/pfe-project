@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Conteneurs</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body ng-controller="ConteneursController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-user-hard-hat"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="conteneurs.html">
+                                <i class="fas fa-box"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper"></i> Arrêts
+                            </a>
+                        </li>
+                    </ul>
+                    <button id="logoutButton" class="btn btn-danger btn-sm" ng-click="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-box me-2"></i>Gestion des Conteneurs</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="printData()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addConteneurModal">
+                                <i class="fas fa-plus me-1"></i> Nouveau Conteneur
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Conteneurs totaux</h6>
+                                            <h2 class="my-2">{{stats.total}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>tous conteneurs</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Avec navire</h6>
+                                            <h2 class="my-2">{{stats.avecNavire}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>conteneurs assignés</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-ship"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Sans navire</h6>
+                                            <h2 class="my-2">{{stats.sansNavire}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>conteneurs libres</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-warehouse"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Types uniques</h6>
+                                            <h2 class="my-2">{{stats.typesUniques}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>types différents</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-layer-group"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="filterData()">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label for="searchId" class="form-label">ID Conteneur</label>
+                                        <input type="text" class="form-control" id="searchId" ng-model="search.id" placeholder="Ex: CTR-001">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchNom" class="form-label">Nom Conteneur</label>
+                                        <input type="text" class="form-control" id="searchNom" ng-model="search.nom" placeholder="Nom du conteneur">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchType" class="form-label">Type</label>
+                                        <select class="form-select" id="searchType" ng-model="search.type">
+                                            <option value="">Tous les types</option>
+                                            <option ng-repeat="type in typesConteneur" value="{{type}}">{{type}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchNavire" class="form-label">Navire</label>
+                                        <select class="form-select" id="searchNavire" ng-model="search.navire">
+                                            <option value="">Tous les navires</option>
+                                            <option ng-repeat="navire in navires" value="{{navire.ID_navire}}">{{navire.NOM_navire}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchGlobal" class="form-label">Recherche générale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchGlobal" ng-model="search.global" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" ng-click="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des conteneurs -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Liste des Conteneurs</h5>
+                            <span class="badge bg-primary">Total: {{filteredConteneurs.length}} conteneurs</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nom</th>
+                                            <th>Type</th>
+                                            <th>ID Type</th>
+                                            <th>Navire</th>
+                                            <th>Date Ajout</th>
+                                            <th>Dernière Opération</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-if="loading">
+                                            <td colspan="9" class="text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="!loading && displayedConteneurs.length === 0">
+                                            <td colspan="9" class="text-center">Aucun conteneur trouvé</td>
+                                        </tr>
+                                        <tr ng-repeat="conteneur in displayedConteneurs">
+                                            <td>{{conteneur.ID_conteneure}}</td>
+                                            <td>{{conteneur.NOM_conteneure}}</td>
+                                            <td>{{conteneur.TYPE_conteneure}}</td>
+                                            <td>{{conteneur.ID_type || '-'}}</td>
+                                            <td>{{conteneur.NOM_navire}}</td>
+                                            <td>{{formatDate(conteneur.DATE_AJOUT)}}</td>
+                                            <td>{{conteneur.TYPE_operation}}</td>
+                                            <td>
+                                                <span class="badge" ng-class="getStatusBadgeClass(conteneur)">
+                                                    {{getStatusText(conteneur)}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info me-1" ng-click="viewConteneur(conteneur)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary me-1" ng-click="editConteneur(conteneur)">
+                                                    <i class="fas fa-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="confirmDeleteConteneur(conteneur)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Affichage {{(currentPage-1)*itemsPerPage + 1}}-{{Math.min(currentPage*itemsPerPage, filteredConteneurs.length)}} sur {{filteredConteneurs.length}} entrées</span>
+                            </div>
+                            <nav aria-label="Navigation des pages">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage - 1); $event.preventDefault()">&laquo;</a>
+                                    </li>
+                                    <li class="page-item" ng-repeat="page in getPages() track by $index" ng-class="{active: page === currentPage}">
+                                        <a class="page-link" href="#" ng-click="setPage(page); $event.preventDefault()">{{page}}</a>
+                                    </li>
+                                    <li class="page-item" ng-class="{disabled: currentPage === totalPages}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage + 1); $event.preventDefault()">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Conteneur -->
+    <div class="modal fade" id="addConteneurModal" tabindex="-1" aria-labelledby="addConteneurModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addConteneurModalLabel">Ajouter un nouveau conteneur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="addForm" novalidate>
+                        <div class="mb-3">
+                            <label for="nomConteneur" class="form-label">Nom du Conteneur <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nomConteneur" name="nom" ng-model="newConteneur.nom" required ng-class="{'is-invalid': addForm.nom.$invalid && addForm.nom.$touched}">
+                            <div class="invalid-feedback" ng-show="addForm.nom.$invalid && addForm.nom.$touched">Veuillez saisir le nom du conteneur.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="typeConteneur" class="form-label">Type de Conteneur <span class="text-danger">*</span></label>
+                            <select class="form-select" id="typeConteneur" name="type" ng-model="newConteneur.type" required ng-class="{'is-invalid': addForm.type.$invalid && addForm.type.$touched}">
+                                <option value="">Sélectionner un type</option>
+                                <option ng-repeat="type in typesConteneur" value="{{type}}">{{type}}</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="addForm.type.$invalid && addForm.type.$touched">Veuillez sélectionner un type de conteneur.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="idType" class="form-label">ID Type (optionnel)</label>
+                            <input type="number" class="form-control" id="idType" ng-model="newConteneur.idType" min="1">
+                            <div class="form-text">Identifiant numérique du type de conteneur</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="navireSelect" class="form-label">Navire (optionnel)</label>
+                            <select class="form-select" id="navireSelect" ng-model="newConteneur.navire" ng-change="onNavireChange()">
+                                <option value="">Aucun navire</option>
+                                <option ng-repeat="navire in navires" value="{{navire.ID_navire}}">{{navire.NOM_navire}} ({{navire.MATRICULE_navire}})</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3" ng-if="newConteneur.nomNavire">
+                            <label for="nomNavire" class="form-label">Nom du Navire</label>
+                            <input type="text" class="form-control" id="nomNavire" ng-model="newConteneur.nomNavire" readonly style="background-color: #f8f9fa;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" ng-click="saveConteneur()" ng-disabled="addForm.$invalid">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modifier Conteneur -->
+    <div class="modal fade" id="editConteneurModal" tabindex="-1" aria-labelledby="editConteneurModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="editConteneurModalLabel">Modifier un conteneur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="editForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">ID Conteneur</label>
+                            <input type="text" class="form-control" ng-model="editConteneur.ID_conteneure" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editNomConteneur" class="form-label">Nom du Conteneur <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editNomConteneur" name="editNom" ng-model="editConteneur.NOM_conteneure" required ng-class="{'is-invalid': editForm.editNom.$invalid && editForm.editNom.$touched}">
+                            <div class="invalid-feedback" ng-show="editForm.editNom.$invalid && editForm.editNom.$touched">Veuillez saisir le nom du conteneur.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editTypeConteneur" class="form-label">Type de Conteneur <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editTypeConteneur" name="editType" ng-model="editConteneur.TYPE_conteneure" required ng-class="{'is-invalid': editForm.editType.$invalid && editForm.editType.$touched}">
+                                <option value="">Sélectionner un type</option>
+                                <option ng-repeat="type in typesConteneur" value="{{type}}">{{type}}</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="editForm.editType.$invalid && editForm.editType.$touched">Veuillez sélectionner un type de conteneur.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editIdType" class="form-label">ID Type (optionnel)</label>
+                            <input type="number" class="form-control" id="editIdType" ng-model="editConteneur.ID_type" min="1">
+                            <div class="form-text">Identifiant numérique du type de conteneur</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editNavireSelect" class="form-label">Navire (optionnel)</label>
+                            <select class="form-select" id="editNavireSelect" ng-model="editConteneur.ID_navire" ng-change="onEditNavireChange()">
+                                <option value="">Aucun navire</option>
+                                <option ng-repeat="navire in navires" value="{{navire.ID_navire}}">{{navire.NOM_navire}} ({{navire.MATRICULE_navire}})</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3" ng-if="editConteneur.NOM_navire && editConteneur.NOM_navire !== 'Aucun navire'">
+                            <label for="editNomNavire" class="form-label">Nom du Navire</label>
+                            <input type="text" class="form-control" id="editNomNavire" ng-model="editConteneur.NOM_navire" readonly style="background-color: #f8f9fa;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-warning" ng-click="updateConteneur()" ng-disabled="editForm.$invalid">Mettre à jour</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Voir Conteneur -->
+    <div class="modal fade" id="viewConteneurModal" tabindex="-1" aria-labelledby="viewConteneurModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="viewConteneurModalLabel">Détails du conteneur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">ID:</div>
+                        <div class="col-8">{{viewConteneur.ID_conteneure}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Nom:</div>
+                        <div class="col-8">{{viewConteneur.NOM_conteneure}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Type:</div>
+                        <div class="col-8">{{viewConteneur.TYPE_conteneure}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">ID Type:</div>
+                        <div class="col-8">{{viewConteneur.ID_type || 'Non défini'}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Navire:</div>
+                        <div class="col-8">{{viewConteneur.NOM_navire}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Date Ajout:</div>
+                        <div class="col-8">{{formatDate(viewConteneur.DATE_AJOUT)}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Dernière Opération:</div>
+                        <div class="col-8">{{viewConteneur.TYPE_operation}}</div>
+                    </div>
+                    <div class="row mb-2" ng-if="viewConteneur.DERNIERE_OPERATION_DATE">
+                        <div class="col-4 fw-bold">Date Dernière Op.:</div>
+                        <div class="col-8">{{formatDate(viewConteneur.DERNIERE_OPERATION_DATE)}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Statut:</div>
+                        <div class="col-8">
+                            <span class="badge" ng-class="getStatusBadgeClass(viewConteneur)">
+                                {{getStatusText(viewConteneur)}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-info text-white" ng-click="openEditFromView()">Modifier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Supprimer Conteneur -->
+    <div class="modal fade" id="deleteConteneurModal" tabindex="-1" aria-labelledby="deleteConteneurModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConteneurModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le conteneur <strong>{{deleteConteneur.NOM_conteneure}}</strong> (ID: <strong>{{deleteConteneur.ID_conteneure}}</strong>) ?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Cette action est irréversible.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" ng-click="deleteConteneur()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerte Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3">
+        <div ng-repeat="alert in alerts" class="alert alert-{{alert.type}} alert-dismissible fade show" role="alert">
+            {{alert.message}}
+            <button type="button" class="btn-close" ng-click="closeAlert($index)" aria-label="Fermer"></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="js/conteneurs.js"></script>
+</body>
+</html>

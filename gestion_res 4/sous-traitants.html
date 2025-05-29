@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionPortuaireApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Sous-traitants</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a, #1e40af);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .table th {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            font-weight: 600;
+            border: none;
+            color: #495057;
+        }
+        .btn-group-sm .btn {
+            border-radius: 6px;
+            margin: 0 1px;
+        }
+        .icon-container {
+            opacity: 0.3;
+            font-size: 2.5rem;
+        }
+        .logo-container {
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .company-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .equipe-badge {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body ng-controller="SoustraitantsController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <i class="fas fa-anchor fa-2x text-white mb-2"></i>
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship me-2"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor me-2"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs me-2"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users me-2"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie me-2"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="sous-traitants.html">
+                                <i class="fas fa-handshake me-2"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock me-2"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container me-2"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box me-2"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper me-2"></i> Arrêts
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="mt-auto p-3">
+                        <button class="btn btn-danger btn-sm w-100" ng-click="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-handshake me-2 text-primary"></i>Gestion des Sous-traitants</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addSoustraitantModal">
+                                <i class="fas fa-plus me-1"></i> Nouveau Sous-traitant
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alertes -->
+                    <div id="alertContainer">
+                        <div ng-show="alert.show" class="alert alert-{{alert.type}} alert-dismissible fade show">
+                            {{alert.message}}
+                            <button type="button" class="btn-close" ng-click="hideAlert()"></button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Total Sous-traitants</h6>
+                                            <h2 class="my-2">{{statistics.total}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>partenaires</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-handshake"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">En équipe</h6>
+                                            <h2 class="my-2">{{statistics.enEquipe}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>assignés</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Entreprises</h6>
+                                            <h2 class="my-2">{{statistics.entreprises}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>partenaires</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Disponibles</h6>
+                                            <h2 class="my-2">{{statistics.disponibles}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>libres</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="filterSoustraitants()">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Matricule</label>
+                                        <input type="text" class="form-control" ng-model="filters.matricule" placeholder="Ex: SUSTR-001">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Nom</label>
+                                        <input type="text" class="form-control" ng-model="filters.nom" placeholder="Ex: Garcia">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Entreprise</label>
+                                        <select class="form-select" ng-model="filters.entreprise">
+                                            <option value="">Toutes</option>
+                                            <option ng-repeat="entreprise in entreprises" value="{{entreprise}}">{{entreprise}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Fonction</label>
+                                        <select class="form-select" ng-model="filters.fonction">
+                                            <option value="">Toutes</option>
+                                            <option ng-repeat="fonction in fonctions" value="{{fonction}}">{{fonction}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Statut équipe</label>
+                                        <select class="form-select" ng-model="filters.statutEquipe">
+                                            <option value="">Tous</option>
+                                            <option value="avec">Avec équipe</option>
+                                            <option value="sans">Sans équipe</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Recherche globale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="filters.global" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" ng-click="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des sous-traitants -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Sous-traitants</h5>
+                            <span class="badge bg-primary">Total: {{filteredSoustraitants.length}} sous-traitants</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-id-card me-1"></i>Matricule</th>
+                                            <th><i class="fas fa-user me-1"></i>Nom complet</th>
+                                            <th><i class="fas fa-building me-1"></i>Entreprise</th>
+                                            <th><i class="fas fa-briefcase me-1"></i>Fonction</th>
+                                            <th><i class="fas fa-phone me-1"></i>Contact</th>
+                                            <th><i class="fas fa-users me-1"></i>Équipes</th>
+                                            <th><i class="fas fa-info-circle me-1"></i>Statut</th>
+                                            <th><i class="fas fa-tools me-1"></i>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-show="loading" class="text-center">
+                                            <td colspan="8" class="py-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                                <p class="mt-2 text-muted">Chargement des sous-traitants...</p>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="!loading && filteredSoustraitants.length === 0" class="text-center">
+                                            <td colspan="8" class="py-4">
+                                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                                <p class="text-muted">Aucun sous-traitant trouvé</p>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="soustraitant in paginatedSoustraitants" class="align-middle">
+                                            <td><strong>{{soustraitant.MATRICULE_soustraiteure}}</strong></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="company-logo me-2">
+                                                        {{soustraitant.ENTREPRISE_soustraiteure.charAt(0)}}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{soustraitant.PRENOM_soustraiteure}} {{soustraitant.NOM_soustraiteure}}</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{soustraitant.ENTREPRISE_soustraiteure}}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" ng-class="getFonctionBadgeClass(soustraitant.FONCTION_soustraiteure)">
+                                                    {{soustraitant.FONCTION_soustraiteure}}
+                                                </span>
+                                            </td>
+                                            <td>{{soustraitant.CONTACT_soustraiteure || '-'}}</td>
+                                            <td>
+                                                <div ng-if="soustraitant.equipes && soustraitant.equipes.length > 0">
+                                                    <span ng-repeat="equipe in soustraitant.equipes | limitTo:2" 
+                                                          class="badge bg-secondary equipe-badge me-1">
+                                                        {{equipe}}
+                                                    </span>
+                                                    <span ng-if="soustraitant.equipes.length > 2" class="badge bg-light text-dark">
+                                                        +{{soustraitant.equipes.length - 2}}
+                                                    </span>
+                                                </div>
+                                                <span ng-if="!soustraitant.equipes || soustraitant.equipes.length === 0" class="text-muted">
+                                                    Aucune équipe
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" ng-class="soustraitant.nb_equipes > 0 ? 'bg-success' : 'bg-secondary'">
+                                                    {{soustraitant.nb_equipes > 0 ? 'Assigné' : 'Disponible'}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button class="btn btn-outline-info" ng-click="viewSoustraitant(soustraitant)" title="Voir détails">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-primary" ng-click="editSoustraitant(soustraitant)" title="Modifier">
+                                                        <i class="fas fa-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger" ng-click="deleteSoustraitant(soustraitant)" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Pagination -->
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Affichage {{getDisplayRange()}} sur {{filteredSoustraitants.length}} résultats</span>
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                                        <button class="page-link" ng-click="setPage(currentPage - 1)">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                    </li>
+                                    <li class="page-item" ng-repeat="page in getPageNumbers()" ng-class="{active: page === currentPage}">
+                                        <button class="page-link" ng-click="setPage(page)">{{page}}</button>
+                                    </li>
+                                    <li class="page-item" ng-class="{disabled: currentPage === getTotalPages()}">
+                                        <button class="page-link" ng-click="setPage(currentPage + 1)">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter/Modifier Sous-traitant -->
+    <div class="modal fade" id="addSoustraitantModal" tabindex="-1" aria-labelledby="addSoustraitantModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addSoustraitantModalLabel">
+                        <i class="fas fa-plus-circle me-2" ng-if="!editMode"></i>
+                        <i class="fas fa-edit me-2" ng-if="editMode"></i>
+                        {{editMode ? 'Modifier' : 'Nouveau'}} Sous-traitant
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form ng-submit="saveSoustraitant()">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nom *</label>
+                                <input type="text" class="form-control" ng-model="currentSoustraitant.NOM_soustraiteure" required placeholder="Ex: Garcia">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Prénom *</label>
+                                <input type="text" class="form-control" ng-model="currentSoustraitant.PRENOM_soustraiteure" required placeholder="Ex: Carlos">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Entreprise *</label>
+                                <input type="text" class="form-control" ng-model="currentSoustraitant.ENTREPRISE_soustraiteure" required placeholder="Ex: TransCargo SARL">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fonction *</label>
+                                <select class="form-select" ng-model="currentSoustraitant.FONCTION_soustraiteure" required>
+                                    <option value="">Sélectionnez une fonction</option>
+                                    <option value="Opérateur">Opérateur</option>
+                                    <option value="Conducteur">Conducteur</option>
+                                    <option value="Manutentionnaire">Manutentionnaire</option>
+                                    <option value="Technicien">Technicien</option>
+                                    <option value="Superviseur">Superviseur</option>
+                                    <option value="Agent de sécurité">Agent de sécurité</option>
+                                    <option value="Logisticien">Logisticien</option>
+                                    <option value="Consultant">Consultant</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Contact</label>
+                                <input type="text" class="form-control" ng-model="currentSoustraitant.CONTACT_soustraiteure" placeholder="Téléphone, email...">
+                            </div>
+                        </div>
+                        <div class="row mb-3" ng-if="editMode">
+                            <div class="col-md-12">
+                                <label class="form-label">Matricule</label>
+                                <input type="text" class="form-control" ng-model="currentSoustraitant.MATRICULE_soustraiteure" readonly>
+                                <div class="form-text">Le matricule ne peut pas être modifié</div>
+                            </div>
+                        </div>
+                        <div class="row mb-3" ng-if="editMode && currentSoustraitant.equipes && currentSoustraitant.equipes.length > 0">
+                            <div class="col-md-12">
+                                <label class="form-label">Équipes assignées</label>
+                                <div class="border rounded p-2">
+                                    <span ng-repeat="equipe in currentSoustraitant.equipes" class="badge bg-secondary equipe-badge">
+                                        {{equipe.NOM_equipe || equipe}}
+                                    </span>
+                                    <div ng-if="currentSoustraitant.equipes.length === 0" class="text-muted">
+                                        Aucune équipe assignée
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="saveSoustraitant()">
+                        <i class="fas fa-save me-1"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script>
+        // Application AngularJS
+        var app = angular.module('gestionPortuaireApp', []);
+
+        // Contrôleur principal pour les sous-traitants
+        app.controller('SoustraitantsController', ['$scope', '$http', function($scope, $http) {
+            // Variables
+            $scope.soustraitants = [];
+            $scope.filteredSoustraitants = [];
+            $scope.paginatedSoustraitants = [];
+            $scope.currentSoustraitant = {};
+            $scope.editMode = false;
+            $scope.loading = true;
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 10;
+            $scope.entreprises = [];
+            $scope.fonctions = [];
+            
+            // Filtres
+            $scope.filters = {
+                matricule: '',
+                nom: '',
+                entreprise: '',
+                fonction: '',
+                statutEquipe: '',
+                global: ''
+            };
+
+            // Statistiques
+            $scope.statistics = {
+                total: 0,
+                enEquipe: 0,
+                entreprises: 0,
+                disponibles: 0
+            };
+
+            // Alertes
+            $scope.alert = {
+                show: false,
+                type: 'info',
+                message: ''
+            };
+
+            // API Base URL
+            var API_BASE_URL = '';
+
+            // Initialisation
+            $scope.init = function() {
+                $scope.loadSoustraitants();
+            };
+
+            // Charger les sous-traitants
+            $scope.loadSoustraitants = function() {
+                $http.get('api/sous-traitants.php')
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.soustraitants = response.data.records;
+                        } else {
+                            throw new Error('API Error');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log('Utilisation des données de démonstration pour les sous-traitants');
+                        $scope.soustraitants = [
+                            {
+                                ID_soustraiteure: 1,
+                                MATRICULE_soustraiteure: 'SUSTR-001',
+                                NOM_soustraiteure: 'Garcia',
+                                PRENOM_soustraiteure: 'Carlos',
+                                FONCTION_soustraiteure: 'Opérateur',
+                                CONTACT_soustraiteure: '06.55.44.33.22',
+                                ENTREPRISE_soustraiteure: 'TransCargo SARL',
+                                nb_equipes: 1,
+                                equipes: ['Équipe Alpha']
+                            },
+                            {
+                                ID_soustraiteure: 2,
+                                MATRICULE_soustraiteure: 'SUSTR-002',
+                                NOM_soustraiteure: 'Silva',
+                                PRENOM_soustraiteure: 'Maria',
+                                FONCTION_soustraiteure: 'Conducteur',
+                                CONTACT_soustraiteure: 'maria.silva@logicargo.com',
+                                ENTREPRISE_soustraiteure: 'LogiCargo SA',
+                                nb_equipes: 0,
+                                equipes: []
+                            },
+                            {
+                                ID_soustraiteure: 3,
+                                MATRICULE_soustraiteure: 'SUSTR-003',
+                                NOM_soustraiteure: 'Chen',
+                                PRENOM_soustraiteure: 'Wei',
+                                FONCTION_soustraiteure: 'Technicien',
+                                CONTACT_soustraiteure: '06.77.88.99.00',
+                                ENTREPRISE_soustraiteure: 'Asia Maritime',
+                                nb_equipes: 2,
+                                equipes: ['Équipe Beta', 'Équipe Gamma']
+                            },
+                            {
+                                ID_soustraiteure: 4,
+                                MATRICULE_soustraiteure: 'SUSTR-004',
+                                NOM_soustraiteure: 'Johnson',
+                                PRENOM_soustraiteure: 'Mike',
+                                FONCTION_soustraiteure: 'Superviseur',
+                                CONTACT_soustraiteure: 'mike.johnson@portservices.fr',
+                                ENTREPRISE_soustraiteure: 'Port Services Ltd',
+                                nb_equipes: 1,
+                                equipes: ['Équipe Delta']
+                            },
+                            {
+                                ID_soustraiteure: 5,
+                                MATRICULE_soustraiteure: 'SUSTR-005',
+                                NOM_soustraiteure: 'Ahmed',
+                                PRENOM_soustraiteure: 'Hassan',
+                                FONCTION_soustraiteure: 'Manutentionnaire',
+                                CONTACT_soustraiteure: null,
+                                ENTREPRISE_soustraiteure: 'Med Logistics',
+                                nb_equipes: 0,
+                                equipes: []
+                            }
+                        ];
+                    })
+                    .finally(function() {
+                        $scope.filteredSoustraitants = angular.copy($scope.soustraitants);
+                        $scope.updateStatistics();
+                        $scope.extractEntreprises();
+                        $scope.extractFonctions();
+                        $scope.updatePagination();
+                        $scope.loading = false;
+                    });
+            };
+
+            // Extraire les entreprises uniques
+            $scope.extractEntreprises = function() {
+                var entreprisesSet = new Set();
+                $scope.soustraitants.forEach(function(s) {
+                    if (s.ENTREPRISE_soustraiteure) {
+                        entreprisesSet.add(s.ENTREPRISE_soustraiteure);
+                    }
+                });
+                $scope.entreprises = Array.from(entreprisesSet).sort();
+            };
+
+            // Extraire les fonctions uniques
+            $scope.extractFonctions = function() {
+                var fonctionsSet = new Set();
+                $scope.soustraitants.forEach(function(s) {
+                    if (s.FONCTION_soustraiteure) {
+                        fonctionsSet.add(s.FONCTION_soustraiteure);
+                    }
+                });
+                $scope.fonctions = Array.from(fonctionsSet).sort();
+            };
+
+            // Mettre à jour les statistiques
+            $scope.updateStatistics = function() {
+                $scope.statistics.total = $scope.soustraitants.length;
+                $scope.statistics.enEquipe = $scope.soustraitants.filter(function(s) { 
+                    return s.nb_equipes > 0; 
+                }).length;
+                $scope.statistics.disponibles = $scope.statistics.total - $scope.statistics.enEquipe;
+                $scope.statistics.entreprises = $scope.entreprises.length;
+            };
+
+            // Filtrer les sous-traitants
+            $scope.filterSoustraitants = function() {
+                $scope.filteredSoustraitants = $scope.soustraitants.filter(function(soustraitant) {
+                    var match = true;
+
+                    if ($scope.filters.matricule) {
+                        match = match && soustraitant.MATRICULE_soustraiteure.toLowerCase().indexOf($scope.filters.matricule.toLowerCase()) !== -1;
+                    }
+                    if ($scope.filters.nom) {
+                        match = match && soustraitant.NOM_soustraiteure.toLowerCase().indexOf($scope.filters.nom.toLowerCase()) !== -1;
+                    }
+                    if ($scope.filters.entreprise) {
+                        match = match && soustraitant.ENTREPRISE_soustraiteure === $scope.filters.entreprise;
+                    }
+                    if ($scope.filters.fonction) {
+                        match = match && soustraitant.FONCTION_soustraiteure === $scope.filters.fonction;
+                    }
+                    if ($scope.filters.statutEquipe) {
+                        if ($scope.filters.statutEquipe === 'avec') {
+                            match = match && soustraitant.nb_equipes > 0;
+                        } else if ($scope.filters.statutEquipe === 'sans') {
+                            match = match && soustraitant.nb_equipes === 0;
+                        }
+                    }
+                    if ($scope.filters.global) {
+                        var global = $scope.filters.global.toLowerCase();
+                        match = match && (
+                            soustraitant.MATRICULE_soustraiteure.toLowerCase().indexOf(global) !== -1 ||
+                            soustraitant.NOM_soustraiteure.toLowerCase().indexOf(global) !== -1 ||
+                            soustraitant.PRENOM_soustraiteure.toLowerCase().indexOf(global) !== -1 ||
+                            soustraitant.ENTREPRISE_soustraiteure.toLowerCase().indexOf(global) !== -1 ||
+                            soustraitant.FONCTION_soustraiteure.toLowerCase().indexOf(global) !== -1 ||
+                            (soustraitant.CONTACT_soustraiteure && soustraitant.CONTACT_soustraiteure.toLowerCase().indexOf(global) !== -1)
+                        );
+                    }
+
+                    return match;
+                });
+
+                $scope.currentPage = 1;
+                $scope.updatePagination();
+            };
+
+            // Réinitialiser les filtres
+            $scope.resetFilters = function() {
+                $scope.filters = {
+                    matricule: '',
+                    nom: '',
+                    entreprise: '',
+                    fonction: '',
+                    statutEquipe: '',
+                    global: ''
+                };
+                $scope.filteredSoustraitants = angular.copy($scope.soustraitants);
+                $scope.currentPage = 1;
+                $scope.updatePagination();
+            };
+
+            // Pagination
+            $scope.updatePagination = function() {
+                var start = ($scope.currentPage - 1) * $scope.itemsPerPage;
+                var end = start + $scope.itemsPerPage;
+                $scope.paginatedSoustraitants = $scope.filteredSoustraitants.slice(start, end);
+            };
+
+            $scope.setPage = function(page) {
+                var totalPages = $scope.getTotalPages();
+                if (page >= 1 && page <= totalPages) {
+                    $scope.currentPage = page;
+                    $scope.updatePagination();
+                }
+            };
+
+            $scope.getTotalPages = function() {
+                return Math.ceil($scope.filteredSoustraitants.length / $scope.itemsPerPage);
+            };
+
+            $scope.getPageNumbers = function() {
+                var totalPages = $scope.getTotalPages();
+                var startPage = Math.max(1, $scope.currentPage - 2);
+                var endPage = Math.min(totalPages, $scope.currentPage + 2);
+                var pages = [];
+                
+                for (var i = startPage; i <= endPage; i++) {
+                    pages.push(i);
+                }
+                return pages;
+            };
+
+            $scope.getDisplayRange = function() {
+                var start = ($scope.currentPage - 1) * $scope.itemsPerPage + 1;
+                var end = Math.min($scope.currentPage * $scope.itemsPerPage, $scope.filteredSoustraitants.length);
+                return start + ' à ' + end;
+            };
+
+            // Utilitaires
+            $scope.getFonctionBadgeClass = function(fonction) {
+                var classes = {
+                    'Opérateur': 'bg-primary',
+                    'Conducteur': 'bg-success',
+                    'Manutentionnaire': 'bg-info',
+                    'Technicien': 'bg-warning',
+                    'Superviseur': 'bg-danger',
+                    'Agent de sécurité': 'bg-dark',
+                    'Logisticien': 'bg-secondary',
+                    'Consultant': 'bg-light text-dark'
+                };
+                return classes[fonction] || 'bg-light text-dark';
+            };
+
+            // Gestion des sous-traitants
+            $scope.newSoustraitant = function() {
+                $scope.currentSoustraitant = {
+                    NOM_soustraiteure: '',
+                    PRENOM_soustraiteure: '',
+                    FONCTION_soustraiteure: '',
+                    CONTACT_soustraiteure: '',
+                    ENTREPRISE_soustraiteure: ''
+                };
+                $scope.editMode = false;
+            };
+
+            $scope.editSoustraitant = function(soustraitant) {
+                $scope.currentSoustraitant = angular.copy(soustraitant);
+                $scope.editMode = true;
+                
+                // Ouvrir le modal
+                var modal = new bootstrap.Modal(document.getElementById('addSoustraitantModal'));
+                modal.show();
+            };
+
+            $scope.viewSoustraitant = function(soustraitant) {
+                var equipesText = soustraitant.equipes && soustraitant.equipes.length > 0 
+                    ? soustraitant.equipes.join(', ') 
+                    : 'Aucune équipe';
+                    
+                $scope.showAlert(
+                    'Détails de ' + soustraitant.PRENOM_soustraiteure + ' ' + soustraitant.NOM_soustraiteure + 
+                    ' (' + soustraitant.ENTREPRISE_soustraiteure + ') - Fonction: ' + soustraitant.FONCTION_soustraiteure + 
+                    ' - Équipes: ' + equipesText, 
+                    'info'
+                );
+            };
+
+            $scope.deleteSoustraitant = function(soustraitant) {
+                if (confirm('Êtes-vous sûr de vouloir supprimer ' + soustraitant.PRENOM_soustraiteure + ' ' + soustraitant.NOM_soustraiteure + ' ?')) {
+                    $http.delete('api/sous-traitants.php?id=' + soustraitant.ID_soustraiteure)
+                        .then(function(response) {
+                            if (response.data.success) {
+                                $scope.soustraitants = $scope.soustraitants.filter(function(s) {
+                                    return s.ID_soustraiteure !== soustraitant.ID_soustraiteure;
+                                });
+                                $scope.filterSoustraitants();
+                                $scope.updateStatistics();
+                                $scope.extractEntreprises();
+                                $scope.extractFonctions();
+                                $scope.showAlert('Sous-traitant ' + soustraitant.PRENOM_soustraiteure + ' ' + soustraitant.NOM_soustraiteure + ' supprimé avec succès', 'success');
+                            } else {
+                                $scope.showAlert('Erreur lors de la suppression: ' + response.data.message, 'danger');
+                            }
+                        })
+                        .catch(function(error) {
+                            // Simulation de suppression locale
+                            $scope.soustraitants = $scope.soustraitants.filter(function(s) {
+                                return s.ID_soustraiteure !== soustraitant.ID_soustraiteure;
+                            });
+                            $scope.filterSoustraitants();
+                            $scope.updateStatistics();
+                            $scope.extractEntreprises();
+                            $scope.extractFonctions();
+                            $scope.showAlert('Sous-traitant ' + soustraitant.PRENOM_soustraiteure + ' ' + soustraitant.NOM_soustraiteure + ' supprimé localement', 'warning');
+                        });
+                }
+            };
+
+            $scope.saveSoustraitant = function() {
+                // Validation
+                if (!$scope.currentSoustraitant.NOM_soustraiteure) {
+                    $scope.showAlert('Le nom est obligatoire', 'warning');
+                    return;
+                }
+                if (!$scope.currentSoustraitant.PRENOM_soustraiteure) {
+                    $scope.showAlert('Le prénom est obligatoire', 'warning');
+                    return;
+                }
+                if (!$scope.currentSoustraitant.FONCTION_soustraiteure) {
+                    $scope.showAlert('La fonction est obligatoire', 'warning');
+                    return;
+                }
+                if (!$scope.currentSoustraitant.ENTREPRISE_soustraiteure) {
+                    $scope.showAlert('L\'entreprise est obligatoire', 'warning');
+                    return;
+                }
+
+                // Préparer les données
+                var soustraitantData = {
+                    nom: $scope.currentSoustraitant.NOM_soustraiteure,
+                    prenom: $scope.currentSoustraitant.PRENOM_soustraiteure,
+                    fonction: $scope.currentSoustraitant.FONCTION_soustraiteure,
+                    contact: $scope.currentSoustraitant.CONTACT_soustraiteure,
+                    entreprise: $scope.currentSoustraitant.ENTREPRISE_soustraiteure
+                };
+
+                var apiCall;
+                if ($scope.editMode) {
+                    apiCall = $http.put('api/sous-traitants.php?id=' + $scope.currentSoustraitant.ID_soustraiteure, soustraitantData);
+                } else {
+                    apiCall = $http.post('api/sous-traitants.php', soustraitantData);
+                }
+
+                apiCall.then(function(response) {
+                    if (response.data.success) {
+                        if ($scope.editMode) {
+                            // Mise à jour
+                            var index = $scope.soustraitants.findIndex(function(s) {
+                                return s.ID_soustraiteure === $scope.currentSoustraitant.ID_soustraiteure;
+                            });
+                            if (index !== -1) {
+                                $scope.soustraitants[index].NOM_soustraiteure = soustraitantData.nom;
+                                $scope.soustraitants[index].PRENOM_soustraiteure = soustraitantData.prenom;
+                                $scope.soustraitants[index].FONCTION_soustraiteure = soustraitantData.fonction;
+                                $scope.soustraitants[index].CONTACT_soustraiteure = soustraitantData.contact;
+                                $scope.soustraitants[index].ENTREPRISE_soustraiteure = soustraitantData.entreprise;
+                            }
+                            $scope.showAlert('Sous-traitant ' + soustraitantData.prenom + ' ' + soustraitantData.nom + ' modifié avec succès', 'success');
+                        } else {
+                            // Création
+                            var newSoustraitant = {
+                                ID_soustraiteure: response.data.id,
+                                MATRICULE_soustraiteure: response.data.matricule,
+                                NOM_soustraiteure: soustraitantData.nom,
+                                PRENOM_soustraiteure: soustraitantData.prenom,
+                                FONCTION_soustraiteure: soustraitantData.fonction,
+                                CONTACT_soustraiteure: soustraitantData.contact,
+                                ENTREPRISE_soustraiteure: soustraitantData.entreprise,
+                                nb_equipes: 0,
+                                equipes: []
+                            };
+                            $scope.soustraitants.push(newSoustraitant);
+                            $scope.showAlert('Sous-traitant ' + soustraitantData.prenom + ' ' + soustraitantData.nom + ' créé avec succès', 'success');
+                        }
+                        
+                        $scope.filterSoustraitants();
+                        $scope.updateStatistics();
+                        $scope.extractEntreprises();
+                        $scope.extractFonctions();
+                        
+                        // Fermer le modal
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('addSoustraitantModal'));
+                        modal.hide();
+                    } else {
+                        $scope.showAlert('Erreur API: ' + (response.data.message || 'Erreur inconnue'), 'danger');
+                    }
+                })
+                .catch(function(error) {
+                    // Simulation locale
+                    if ($scope.editMode) {
+                        var index = $scope.soustraitants.findIndex(function(s) {
+                            return s.ID_soustraiteure === $scope.currentSoustraitant.ID_soustraiteure;
+                        });
+                        if (index !== -1) {
+                            $scope.soustraitants[index].NOM_soustraiteure = soustraitantData.nom;
+                            $scope.soustraitants[index].PRENOM_soustraiteure = soustraitantData.prenom;
+                            $scope.soustraitants[index].FONCTION_soustraiteure = soustraitantData.fonction;
+                            $scope.soustraitants[index].CONTACT_soustraiteure = soustraitantData.contact;
+                            $scope.soustraitants[index].ENTREPRISE_soustraiteure = soustraitantData.entreprise;
+                        }
+                        $scope.showAlert('Sous-traitant ' + soustraitantData.prenom + ' ' + soustraitantData.nom + ' modifié localement', 'warning');
+                    } else {
+                        var newId = $scope.soustraitants.length + 1;
+                        var newSoustraitant = {
+                            ID_soustraiteure: newId,
+                            MATRICULE_soustraiteure: 'SUSTR-' + String(newId).padStart(3, '0'),
+                            NOM_soustraiteure: soustraitantData.nom,
+                            PRENOM_soustraiteure: soustraitantData.prenom,
+                            FONCTION_soustraiteure: soustraitantData.fonction,
+                            CONTACT_soustraiteure: soustraitantData.contact,
+                            ENTREPRISE_soustraiteure: soustraitantData.entreprise,
+                            nb_equipes: 0,
+                            equipes: []
+                        };
+                        $scope.soustraitants.push(newSoustraitant);
+                        $scope.showAlert('Sous-traitant ' + soustraitantData.prenom + ' ' + soustraitantData.nom + ' créé localement', 'warning');
+                    }
+                    
+                    $scope.filterSoustraitants();
+                    $scope.updateStatistics();
+                    $scope.extractEntreprises();
+                    $scope.extractFonctions();
+                    
+                    // Fermer le modal
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('addSoustraitantModal'));
+                    if (modal) modal.hide();
+                });
+            };
+
+            // Export des données
+            $scope.exportData = function() {
+                var csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Matricule,Nom,Prénom,Entreprise,Fonction,Contact,Équipes,Statut\n";
+                
+                $scope.filteredSoustraitants.forEach(function(soustraitant) {
+                    csvContent += [
+                        soustraitant.MATRICULE_soustraiteure,
+                        soustraitant.NOM_soustraiteure,
+                        soustraitant.PRENOM_soustraiteure,
+                        soustraitant.ENTREPRISE_soustraiteure,
+                        soustraitant.FONCTION_soustraiteure,
+                        soustraitant.CONTACT_soustraiteure || '',
+                        soustraitant.equipes ? soustraitant.equipes.join(';') : '',
+                        soustraitant.nb_equipes > 0 ? 'Assigné' : 'Disponible'
+                    ].join(',') + '\n';
+                });
+                
+                var encodedUri = encodeURI(csvContent);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "sous_traitants_" + new Date().toISOString().slice(0, 10) + ".csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                $scope.showAlert('Données exportées avec succès', 'success');
+            };
+
+            // Système d'alertes
+            $scope.showAlert = function(message, type) {
+                $scope.alert = {
+                    show: true,
+                    type: type || 'info',
+                    message: message
+                };
+                
+                // Auto-masquer après 5 secondes
+                setTimeout(function() {
+                    $scope.hideAlert();
+                    $scope.$apply();
+                }, 5000);
+            };
+
+            $scope.hideAlert = function() {
+                $scope.alert.show = false;
+            };
+
+            // Déconnexion
+            $scope.logout = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = 'login.html';
+            };
+
+            // Initialisation automatique
+            $scope.init();
+
+            // Préparer nouveau sous-traitant au clic sur le bouton
+            setTimeout(function() {
+                var addButton = document.querySelector('[data-bs-target="#addSoustraitantModal"]');
+                if (addButton) {
+                    addButton.addEventListener('click', function() {
+                        $scope.newSoustraitant();
+                        $scope.$apply();
+                    });
+                }
+            }, 1000);
+        }]);
+    </script>
+</body>
+</html>

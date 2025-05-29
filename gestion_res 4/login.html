@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="loginApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Gestion Portuaire</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-container i {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .logo-container h1 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-container p {
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-floating input {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-floating input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-floating label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #666;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .form-check {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-accounts {
+            background: rgba(240, 248, 255, 0.8);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .demo-accounts h6 {
+            color: #667eea;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .demo-account {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .demo-account:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateX(5px);
+        }
+
+        .demo-account:last-child {
+            margin-bottom: 0;
+        }
+
+        .demo-account .role {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .role-admin {
+            background: #dc3545;
+        }
+
+        .role-user {
+            background: #17a2b8;
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .loading .btn-text {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body ng-controller="LoginController">
+    <div class="login-container">
+        <div class="logo-container">
+            <i class="fas fa-anchor"></i>
+            <h1>Gestion Portuaire</h1>
+            <p>Système de gestion des ressources</p>
+        </div>
+
+        <!-- Alertes -->
+        <div ng-repeat="alert in alerts" class="alert alert-{{alert.type}} alert-dismissible fade show" role="alert">
+            {{alert.message}}
+            <button type="button" class="btn-close" ng-click="closeAlert($index)" aria-label="Fermer"></button>
+        </div>
+
+        <!-- Formulaire de connexion -->
+        <form name="loginForm" ng-submit="login()" novalidate>
+            <div class="form-floating">
+                <input type="email" 
+                       class="form-control" 
+                       id="email" 
+                       name="email"
+                       ng-model="loginData.email" 
+                       placeholder="name@example.com" 
+                       required
+                       ng-class="{'is-invalid': loginForm.email.$invalid && loginForm.email.$touched}">
+                <label for="email">Adresse email</label>
+                <div class="invalid-feedback" ng-show="loginForm.email.$invalid && loginForm.email.$touched">
+                    <span ng-show="loginForm.email.$error.required">L'email est requis</span>
+                    <span ng-show="loginForm.email.$error.email">Format d'email invalide</span>
+                </div>
+            </div>
+
+            <div class="form-floating position-relative">
+                <input type="password" 
+                       class="form-control" 
+                       id="password" 
+                       name="password"
+                       ng-model="loginData.password" 
+                       placeholder="Mot de passe" 
+                       required
+                       ng-class="{'is-invalid': loginForm.password.$invalid && loginForm.password.$touched}">
+                <label for="password">Mot de passe</label>
+                <button type="button" 
+                        class="password-toggle" 
+                        ng-click="togglePasswordVisibility()">
+                    <i class="fas" ng-class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+                <div class="invalid-feedback" ng-show="loginForm.password.$invalid && loginForm.password.$touched">
+                    <span ng-show="loginForm.password.$error.required">Le mot de passe est requis</span>
+                </div>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" 
+                       type="checkbox" 
+                       id="rememberMe" 
+                       ng-model="loginData.rememberMe">
+                <label class="form-check-label" for="rememberMe">
+                    Se souvenir de moi
+                </label>
+            </div>
+
+            <button type="submit" 
+                    class="btn btn-primary btn-login" 
+                    ng-disabled="loginForm.$invalid || loading"
+                    ng-class="{'loading': loading}">
+                <span class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin me-2"></i>
+                </span>
+                <span class="btn-text">
+                    <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                </span>
+            </button>
+        </form>
+
+        <div class="forgot-password">
+            <a href="#" ng-click="showForgotPassword()">Mot de passe oublié ?</a>
+        </div>
+
+        <!-- Comptes de démonstration -->
+        <div class="demo-accounts">
+            <h6><i class="fas fa-user-circle me-2"></i>Comptes de démonstration</h6>
+            <div class="demo-account" ng-click="fillDemoAccount('admin@marsamaroc.co.ma', 'admin123')">
+                <div>
+                    <strong>admin@marsamaroc.co.ma</strong><br>
+                    <small class="text-muted">Administrateur système</small>
+                </div>
+                <span class="role role-admin">ADMIN</span>
+            </div>
+            <div class="demo-account" ng-click="fillDemoAccount('user@marsamaroc.co.ma', 'user123')">
+                <div>
+                    <strong>user@marsamaroc.co.ma</strong><br>
+                    <small class="text-muted">Utilisateur standard</small>
+                </div>
+                <span class="role role-user">USER</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mot de passe oublié -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Récupération du mot de passe</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Entrez votre adresse email pour recevoir les instructions de récupération.</p>
+                    <form name="forgotForm" novalidate>
+                        <div class="mb-3">
+                            <label for="forgotEmail" class="form-label">Adresse email</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="forgotEmail" 
+                                   name="forgotEmail"
+                                   ng-model="forgotPassword.email" 
+                                   placeholder="Votre adresse email" 
+                                   required
+                                   ng-class="{'is-invalid': forgotForm.forgotEmail.$invalid && forgotForm.forgotEmail.$touched}">
+                            <div class="invalid-feedback" ng-show="forgotForm.forgotEmail.$invalid && forgotForm.forgotEmail.$touched">
+                                <span ng-show="forgotForm.forgotEmail.$error.required">L'email est requis</span>
+                                <span ng-show="forgotForm.forgotEmail.$error.email">Format d'email invalide</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            ng-click="sendResetEmail()" 
+                            ng-disabled="forgotForm.$invalid || sendingReset">
+                        <span ng-show="sendingReset">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                        </span>
+                        Envoyer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>

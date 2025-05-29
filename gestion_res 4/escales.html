@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Escales</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body ng-controller="EscalesController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="escales.html">
+                                <i class="fas fa-anchor"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-user-hard-hat"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper"></i> Arrêts
+                            </a>
+                        </li>
+                    </ul>
+                    <button id="logoutButton" class="btn btn-danger btn-sm" ng-click="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-anchor me-2"></i>Gestion des Escales</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="printData()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addEscaleModal">
+                                <i class="fas fa-plus me-1"></i> Nouvelle Escale
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Escales totales</h6>
+                                            <h2 class="my-2">{{stats.total}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>toutes escales</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-anchor"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">En cours</h6>
+                                            <h2 class="my-2">{{stats.enCours}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>escales actives</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-ship"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Aujourd'hui</h6>
+                                            <h2 class="my-2">{{stats.today}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>escales du jour</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Durée moyenne</h6>
+                                            <h2 class="my-2">{{stats.dureeMoyenne}}h</h2>
+                                            <p class="card-text mb-0">
+                                                <small>temps moyen</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="filterData()">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label for="searchNumero" class="form-label">Numéro Escale</label>
+                                        <input type="text" class="form-control" id="searchNumero" ng-model="search.numero" placeholder="Ex: ESC-001">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchNavire" class="form-label">Navire</label>
+                                        <select class="form-select" id="searchNavire" ng-model="search.navire">
+                                            <option value="">Tous les navires</option>
+                                            <option ng-repeat="navire in navires" value="{{navire.MATRICULE_navire}}">{{navire.NOM_navire}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchDateDebut" class="form-label">Date début</label>
+                                        <input type="date" class="form-control" id="searchDateDebut" ng-model="search.dateDebut">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchGlobal" class="form-label">Recherche générale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchGlobal" ng-model="search.global" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" ng-click="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des escales -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Liste des Escales</h5>
+                            <span class="badge bg-primary">Total: {{filteredEscales.length}} escales</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Numéro</th>
+                                            <th>Navire</th>
+                                            <th>Matricule</th>
+                                            <th>Date Accostage</th>
+                                            <th>Date Sortie</th>
+                                            <th>Durée</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-if="loading">
+                                            <td colspan="8" class="text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="!loading && displayedEscales.length === 0">
+                                            <td colspan="8" class="text-center">Aucune escale trouvée</td>
+                                        </tr>
+                                        <tr ng-repeat="escale in displayedEscales">
+                                            <td>{{escale.NUM_escale}}</td>
+                                            <td>{{escale.NOM_navire}}</td>
+                                            <td>{{escale.MATRICULE_navire}}</td>
+                                            <td>{{formatDate(escale.DATE_accostage)}}</td>
+                                            <td>{{formatDate(escale.DATE_sortie)}}</td>
+                                            <td>{{calculateDuration(escale.DATE_accostage, escale.DATE_sortie)}}</td>
+                                            <td>
+                                                <span class="badge" ng-class="getStatusBadgeClass(escale)">
+                                                    {{getStatusText(escale)}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info me-1" ng-click="viewEscale(escale)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary me-1" ng-click="editEscale(escale)">
+                                                    <i class="fas fa-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="confirmDeleteEscale(escale)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Affichage {{(currentPage-1)*itemsPerPage + 1}}-{{Math.min(currentPage*itemsPerPage, filteredEscales.length)}} sur {{filteredEscales.length}} entrées</span>
+                            </div>
+                            <nav aria-label="Navigation des pages">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage - 1); $event.preventDefault()">&laquo;</a>
+                                    </li>
+                                    <li class="page-item" ng-repeat="page in getPages() track by $index" ng-class="{active: page === currentPage}">
+                                        <a class="page-link" href="#" ng-click="setPage(page); $event.preventDefault()">{{page}}</a>
+                                    </li>
+                                    <li class="page-item" ng-class="{disabled: currentPage === totalPages}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage + 1); $event.preventDefault()">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Escale -->
+    <div class="modal fade" id="addEscaleModal" tabindex="-1" aria-labelledby="addEscaleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addEscaleModalLabel">Ajouter une nouvelle escale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="addForm" novalidate>
+                        <div class="mb-3">
+                            <label for="navireSelect" class="form-label">Navire <span class="text-danger">*</span></label>
+                            <select class="form-select" id="navireSelect" name="navire" ng-model="newEscale.navire" ng-change="onNavireChange()" required ng-class="{'is-invalid': addForm.navire.$invalid && addForm.navire.$touched}">
+                                <option value="">Sélectionner un navire</option>
+                                <option ng-repeat="navire in navires" value="{{navire.MATRICULE_navire}}">{{navire.NOM_navire}} ({{navire.MATRICULE_navire}})</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="addForm.navire.$invalid && addForm.navire.$touched">Veuillez sélectionner un navire.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nomNavire" class="form-label">Nom du Navire</label>
+                            <input type="text" class="form-control" id="nomNavire" ng-model="newEscale.nomNavire" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dateAccostage" class="form-label">Date et Heure d'Accostage <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="dateAccostage" name="dateAccostage" ng-model="newEscale.dateAccostage" required ng-class="{'is-invalid': addForm.dateAccostage.$invalid && addForm.dateAccostage.$touched}">
+                            <div class="invalid-feedback" ng-show="addForm.dateAccostage.$invalid && addForm.dateAccostage.$touched">Veuillez saisir la date d'accostage.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dateSortie" class="form-label">Date et Heure de Sortie <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="dateSortie" name="dateSortie" ng-model="newEscale.dateSortie" required ng-class="{'is-invalid': addForm.dateSortie.$invalid && addForm.dateSortie.$touched}">
+                            <div class="invalid-feedback" ng-show="addForm.dateSortie.$invalid && addForm.dateSortie.$touched">Veuillez saisir la date de sortie.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" ng-click="saveEscale()" ng-disabled="addForm.$invalid">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modifier Escale -->
+    <div class="modal fade" id="editEscaleModal" tabindex="-1" aria-labelledby="editEscaleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="editEscaleModalLabel">Modifier une escale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="editForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Numéro d'Escale</label>
+                            <input type="text" class="form-control" ng-model="editEscale.NUM_escale" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNavireSelect" class="form-label">Navire <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editNavireSelect" name="editNavire" ng-model="editEscale.MATRICULE_navire" ng-change="onEditNavireChange()" required ng-class="{'is-invalid': editForm.editNavire.$invalid && editForm.editNavire.$touched}">
+                                <option value="">Sélectionner un navire</option>
+                                <option ng-repeat="navire in navires" value="{{navire.MATRICULE_navire}}">{{navire.NOM_navire}} ({{navire.MATRICULE_navire}})</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="editForm.editNavire.$invalid && editForm.editNavire.$touched">Veuillez sélectionner un navire.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNomNavire" class="form-label">Nom du Navire</label>
+                            <input type="text" class="form-control" id="editNomNavire" ng-model="editEscale.NOM_navire" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDateAccostage" class="form-label">Date et Heure d'Accostage <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="editDateAccostage" name="editDateAccostage" ng-model="editEscale.DATE_accostage" required ng-class="{'is-invalid': editForm.editDateAccostage.$invalid && editForm.editDateAccostage.$touched}">
+                            <div class="invalid-feedback" ng-show="editForm.editDateAccostage.$invalid && editForm.editDateAccostage.$touched">Veuillez saisir la date d'accostage.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDateSortie" class="form-label">Date et Heure de Sortie <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="editDateSortie" name="editDateSortie" ng-model="editEscale.DATE_sortie" required ng-class="{'is-invalid': editForm.editDateSortie.$invalid && editForm.editDateSortie.$touched}">
+                            <div class="invalid-feedback" ng-show="editForm.editDateSortie.$invalid && editForm.editDateSortie.$touched">Veuillez saisir la date de sortie.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-warning" ng-click="updateEscale()" ng-disabled="editForm.$invalid">Mettre à jour</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Voir Escale -->
+    <div class="modal fade" id="viewEscaleModal" tabindex="-1" aria-labelledby="viewEscaleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="viewEscaleModalLabel">Détails de l'escale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Numéro:</div>
+                        <div class="col-8">{{viewEscale.NUM_escale}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Navire:</div>
+                        <div class="col-8">{{viewEscale.NOM_navire}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Matricule:</div>
+                        <div class="col-8">{{viewEscale.MATRICULE_navire}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Date Accostage:</div>
+                        <div class="col-8">{{formatDate(viewEscale.DATE_accostage)}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Date Sortie:</div>
+                        <div class="col-8">{{formatDate(viewEscale.DATE_sortie)}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Durée:</div>
+                        <div class="col-8">{{calculateDuration(viewEscale.DATE_accostage, viewEscale.DATE_sortie)}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Statut:</div>
+                        <div class="col-8">
+                            <span class="badge" ng-class="getStatusBadgeClass(viewEscale)">
+                                {{getStatusText(viewEscale)}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-info text-white" ng-click="openEditFromView()">Modifier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Supprimer Escale -->
+    <div class="modal fade" id="deleteEscaleModal" tabindex="-1" aria-labelledby="deleteEscaleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteEscaleModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer l'escale <strong>{{deleteEscale.NUM_escale}}</strong> du navire <strong>{{deleteEscale.NOM_navire}}</strong> ?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Cette action est irréversible.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" ng-click="deleteEscale()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerte Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3">
+        <div ng-repeat="alert in alerts" class="alert alert-{{alert.type}} alert-dismissible fade show" role="alert">
+            {{alert.message}}
+            <button type="button" class="btn-close" ng-click="closeAlert($index)" aria-label="Fermer"></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="js/escales.js"></script>
+</body>
+</html>

@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionPortuaireApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Équipes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a, #1e40af);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .table th {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            font-weight: 600;
+            border: none;
+            color: #495057;
+        }
+        .btn-group-sm .btn {
+            border-radius: 6px;
+            margin: 0 1px;
+        }
+        .icon-container {
+            opacity: 0.3;
+            font-size: 2.5rem;
+        }
+        .logo-container {
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .company-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .member-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            margin-right: 5px;
+        }
+        .team-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .team-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body ng-controller="EquipeController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <i class="fas fa-anchor fa-2x text-white mb-2"></i>
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship me-2"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor me-2"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs me-2"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="equipes.html">
+                                <i class="fas fa-users me-2"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie me-2"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-handshake me-2"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock me-2"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container me-2"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box me-2"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper me-2"></i> Arrêts
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="mt-auto p-3">
+                        <button class="btn btn-danger btn-sm w-100" ng-click="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-users me-2 text-primary"></i>Gestion des Équipes</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipeModal">
+                                <i class="fas fa-plus me-1"></i> Nouvelle Équipe
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alertes -->
+                    <div id="alertContainer">
+                        <div ng-show="alert.show" class="alert alert-{{alert.type}} alert-dismissible fade show">
+                            {{alert.message}}
+                            <button type="button" class="btn-close" ng-click="hideAlert()"></button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Total Équipes</h6>
+                                            <h2 class="my-2">{{statistics.total}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>équipes créées</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Personnel Total</h6>
+                                            <h2 class="my-2">{{statistics.totalPersonnel}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>membres</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Sous-traitants</h6>
+                                            <h2 class="my-2">{{statistics.totalSoustraitants}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>partenaires</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-handshake"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Équipes Actives</h6>
+                                            <h2 class="my-2">{{statistics.equipesActives}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>avec membres</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-users-cog"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="filterEquipes()">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">ID Équipe</label>
+                                        <input type="text" class="form-control" ng-model="filters.id" placeholder="Ex: EQ-001">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nom d'équipe</label>
+                                        <input type="text" class="form-control" ng-model="filters.nom" placeholder="Ex: Équipe Alpha">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Taille équipe</label>
+                                        <select class="form-select" ng-model="filters.taille">
+                                            <option value="">Toutes</option>
+                                            <option value="vide">Équipes vides</option>
+                                            <option value="petite">Petites (1-5 membres)</option>
+                                            <option value="moyenne">Moyennes (6-10 membres)</option>
+                                            <option value="grande">Grandes (11+ membres)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Recherche globale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="filters.global" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" ng-click="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des équipes -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Équipes</h5>
+                            <span class="badge bg-primary">Total: {{filteredEquipes.length}} équipes</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-id-card me-1"></i>ID</th>
+                                            <th><i class="fas fa-users me-1"></i>Nom de l'équipe</th>
+                                            <th><i class="fas fa-user me-1"></i>Personnel</th>
+                                            <th><i class="fas fa-handshake me-1"></i>Sous-traitants</th>
+                                            <th><i class="fas fa-chart-pie me-1"></i>Total membres</th>
+                                            <th><i class="fas fa-info-circle me-1"></i>Statut</th>
+                                            <th><i class="fas fa-tools me-1"></i>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-show="loading" class="text-center">
+                                            <td colspan="7" class="py-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                                <p class="mt-2 text-muted">Chargement des équipes...</p>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="!loading && filteredEquipes.length === 0" class="text-center">
+                                            <td colspan="7" class="py-4">
+                                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                                <p class="text-muted">Aucune équipe trouvée</p>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="equipe in paginatedEquipes" class="align-middle">
+                                            <td><strong class="badge bg-primary">{{equipe.ID_equipe}}</strong></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="company-logo me-2">
+                                                        {{equipe.NOM_equipe.charAt(0)}}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{equipe.NOM_equipe}}</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{equipe.personnel_count || 0}} personnel</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning">{{equipe.soustraitants_count || 0}} sous-traitants</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">{{(equipe.personnel_count || 0) + (equipe.soustraitants_count || 0)}} membres</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" ng-class="((equipe.personnel_count || 0) + (equipe.soustraitants_count || 0)) > 0 ? 'bg-success' : 'bg-secondary'">
+                                                    {{((equipe.personnel_count || 0) + (equipe.soustraitants_count || 0)) > 0 ? 'Active' : 'Vide'}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button class="btn btn-outline-info" ng-click="viewEquipe(equipe)" title="Voir détails">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-primary" ng-click="editEquipe(equipe)" title="Modifier">
+                                                        <i class="fas fa-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-success" ng-click="manageMembers(equipe)" title="Gérer membres">
+                                                        <i class="fas fa-users-cog"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger" ng-click="deleteEquipe(equipe)" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Pagination -->
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Affichage {{getDisplayRange()}} sur {{filteredEquipes.length}} résultats</span>
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                                        <button class="page-link" ng-click="setPage(currentPage - 1)">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                    </li>
+                                    <li class="page-item" ng-repeat="page in getPageNumbers()" ng-class="{active: page === currentPage}">
+                                        <button class="page-link" ng-click="setPage(page)">{{page}}</button>
+                                    </li>
+                                    <li class="page-item" ng-class="{disabled: currentPage === getTotalPages()}">
+                                        <button class="page-link" ng-click="setPage(currentPage + 1)">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter/Modifier Équipe -->
+    <div class="modal fade" id="addEquipeModal" tabindex="-1" aria-labelledby="addEquipeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2" ng-if="!editMode"></i>
+                        <i class="fas fa-edit me-2" ng-if="editMode"></i>
+                        {{editMode ? 'Modifier' : 'Nouvelle'}} Équipe
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form ng-submit="saveEquipe()">
+                        <div class="mb-3">
+                            <label class="form-label">Nom de l'équipe <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" ng-model="currentEquipe.NOM_equipe" 
+                                   required placeholder="Ex: Équipe Manutention Alpha">
+                        </div>
+                        <div class="mb-3" ng-if="editMode">
+                            <label class="form-label">ID</label>
+                            <input type="text" class="form-control" ng-model="currentEquipe.ID_equipe" readonly>
+                            <div class="form-text">L'ID ne peut pas être modifié</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="saveEquipe()">
+                        <i class="fas fa-save me-1"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestion des Membres -->
+    <div class="modal fade" id="membersModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-users-cog me-2"></i> Gestion des membres - {{selectedEquipe.NOM_equipe}}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs" id="membersTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="personnel-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#personnel" type="button" role="tab">
+                                <i class="fas fa-user me-1"></i> Personnel ({{equipePersonnel.length}})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="soustraitants-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#soustraitants" type="button" role="tab">
+                                <i class="fas fa-handshake me-1"></i> Sous-traitants ({{equipeSoustraitants.length}})
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mt-3" id="membersTabContent">
+                        <!-- Personnel Tab -->
+                        <div class="tab-pane fade show active" id="personnel" role="tabpanel">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <select class="form-select" ng-model="selectedPersonnel" 
+                                            ng-options="p.MATRICULE_personnel + ' - ' + p.NOM_personnel + ' ' + p.PRENOM_personnel + ' (' + p.FONCTION_personnel + ')' for p in availablePersonnel track by p.ID_personnel">
+                                        <option value="">Sélectionner un personnel...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-success w-100" ng-click="addPersonnelToEquipe()" 
+                                            ng-disabled="!selectedPersonnel">
+                                        <i class="fas fa-plus me-1"></i> Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Liste Personnel -->
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Matricule</th>
+                                            <th>Nom complet</th>
+                                            <th>Fonction</th>
+                                            <th>Contact</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="p in equipePersonnel">
+                                            <td><span class="badge bg-primary">{{p.MATRICULE_personnel}}</span></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="member-avatar me-2">
+                                                        {{p.PRENOM_personnel.charAt(0)}}
+                                                    </div>
+                                                    {{p.PRENOM_personnel}} {{p.NOM_personnel}}
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-info">{{p.FONCTION_personnel}}</span></td>
+                                            <td>{{p.CONTACT_personnel || '-'}}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" 
+                                                        ng-click="removePersonnelFromEquipe(p)" title="Retirer">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="equipePersonnel.length === 0">
+                                            <td colspan="5" class="text-center text-muted py-3">
+                                                <i class="fas fa-info-circle me-1"></i> Aucun personnel assigné
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sous-traitants Tab -->
+                        <div class="tab-pane fade" id="soustraitants" role="tabpanel">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <select class="form-select" ng-model="selectedSoustraitant" 
+                                            ng-options="s.MATRICULE_soustraiteure + ' - ' + s.NOM_soustraiteure + ' ' + s.PRENOM_soustraiteure + ' (' + s.ENTREPRISE_soustraiteure + ')' for s in availableSoustraitants track by s.ID_soustraiteure">
+                                        <option value="">Sélectionner un sous-traitant...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-success w-100" ng-click="addSoustraitantToEquipe()" 
+                                            ng-disabled="!selectedSoustraitant">
+                                        <i class="fas fa-plus me-1"></i> Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Liste Sous-traitants -->
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Matricule</th>
+                                            <th>Nom complet</th>
+                                            <th>Fonction</th>
+                                            <th>Entreprise</th>
+                                            <th>Contact</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="s in equipeSoustraitants">
+                                            <td><span class="badge bg-warning">{{s.MATRICULE_soustraiteure}}</span></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="member-avatar me-2" style="background: linear-gradient(45deg, #ffc107, #fd7e14);">
+                                                        {{s.PRENOM_soustraiteure.charAt(0)}}
+                                                    </div>
+                                                    {{s.PRENOM_soustraiteure}} {{s.NOM_soustraiteure}}
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-secondary">{{s.FONCTION_soustraiteure}}</span></td>
+                                            <td><span class="badge bg-info">{{s.ENTREPRISE_soustraiteure}}</span></td>
+                                            <td>{{s.CONTACT_soustraiteure || '-'}}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" 
+                                                        ng-click="removeSoustraitantFromEquipe(s)" title="Retirer">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="equipeSoustraitants.length === 0">
+                                            <td colspan="6" class="text-center text-muted py-3">
+                                                <i class="fas fa-info-circle me-1"></i> Aucun sous-traitant assigné
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script>
+        // Application AngularJS
+        var app = angular.module('gestionPortuaireApp', []);
+
+        // Contrôleur principal pour les équipes
+        app.controller('EquipeController', ['$scope', '$http', function($scope, $http) {
+            // Variables
+            $scope.equipes = [];
+            $scope.filteredEquipes = [];
+            $scope.paginatedEquipes = [];
+            $scope.currentEquipe = {};
+            $scope.selectedEquipe = {};
+            $scope.editMode = false;
+            $scope.loading = true;
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 10;
+            
+            // Variables pour la gestion des membres
+            $scope.equipePersonnel = [];
+            $scope.equipeSoustraitants = [];
+            $scope.availablePersonnel = [];
+            $scope.availableSoustraitants = [];
+            $scope.selectedPersonnel = null;
+            $scope.selectedSoustraitant = null;
+            
+            // Filtres
+            $scope.filters = {
+                id: '',
+                nom: '',
+                taille: '',
+                global: ''
+            };
+
+            // Statistiques
+            $scope.statistics = {
+                total: 0,
+                totalPersonnel: 0,
+                totalSoustraitants: 0,
+                equipesActives: 0
+            };
+
+            // Alertes
+            $scope.alert = {
+                show: false,
+                type: 'info',
+                message: ''
+            };
+
+            // API Base URL
+            var API_BASE_URL = 'api/';
+
+            // Initialisation
+            $scope.init = function() {
+                $scope.loadEquipes();
+                $scope.loadPersonnel();
+                $scope.loadSoustraitants();
+            };
+
+            // Charger les équipes
+            $scope.loadEquipes = function() {
+                $http.get(API_BASE_URL + 'equipes.php')
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.equipes = response.data.records;
+                        } else {
+                            throw new Error('API Error');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log('Utilisation des données de démonstration pour les équipes');
+                        $scope.equipes = [
+                            {
+                                ID_equipe: 'EQ-001',
+                                NOM_equipe: 'Équipe Alpha',
+                                personnel_count: 5,
+                                soustraitants_count: 2
+                            },
+                            {
+                                ID_equipe: 'EQ-002',
+                                NOM_equipe: 'Équipe Beta',
+                                personnel_count: 3,
+                                soustraitants_count: 1
+                            },
+                            {
+                                ID_equipe: 'EQ-003',
+                                NOM_equipe: 'Équipe Gamma',
+                                personnel_count: 0,
+                                soustraitants_count: 0
+                            },
+                            {
+                                ID_equipe: 'EQ-004',
+                                NOM_equipe: 'Équipe Delta',
+                                personnel_count: 7,
+                                soustraitants_count: 3
+                            },
+                            {
+                                ID_equipe: 'EQ-005',
+                                NOM_equipe: 'Équipe Maintenance',
+                                personnel_count: 4,
+                                soustraitants_count: 1
+                            }
+                        ];
+                    })
+                    .finally(function() {
+                        $scope.filteredEquipes = angular.copy($scope.equipes);
+                        $scope.updateStatistics();
+                        $scope.updatePagination();
+                        $scope.loading = false;
+                    });
+            };
+
+            // Charger le personnel disponible
+            $scope.loadPersonnel = function() {
+                $http.get(API_BASE_URL + 'personnel.php')
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.availablePersonnel = response.data.records;
+                        }
+                    })
+                    .catch(function(error) {
+                        // Données de démonstration
+                        $scope.availablePersonnel = [
+                            {
+                                ID_personnel: 1,
+                                MATRICULE_personnel: 'MARMA-001',
+                                NOM_personnel: 'Alami',
+                                PRENOM_personnel: 'Ahmed',
+                                FONCTION_personnel: 'Chef d\'équipe',
+                                CONTACT_personnel: '06.12.34.56.78'
+                            },
+                            {
+                                ID_personnel: 2,
+                                MATRICULE_personnel: 'MARMA-002',
+                                NOM_personnel: 'Benali',
+                                PRENOM_personnel: 'Fatima',
+                                FONCTION_personnel: 'Opérateur',
+                                CONTACT_personnel: '06.23.45.67.89'
+                            }
+                        ];
+                    });
+            };
+
+            // Charger les sous-traitants disponibles
+            $scope.loadSoustraitants = function() {
+                $http.get(API_BASE_URL + 'sous-traitants.php')
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.availableSoustraitants = response.data.records;
+                        }
+                    })
+                    .catch(function(error) {
+                        // Données de démonstration
+                        $scope.availableSoustraitants = [
+                            {
+                                ID_soustraiteure: 1,
+                                MATRICULE_soustraiteure: 'SUSTR-001',
+                                NOM_soustraiteure: 'Garcia',
+                                PRENOM_soustraiteure: 'Carlos',
+                                FONCTION_soustraiteure: 'Opérateur',
+                                CONTACT_soustraiteure: '06.55.44.33.22',
+                                ENTREPRISE_soustraiteure: 'TransCargo SARL'
+                            },
+                            {
+                                ID_soustraiteure: 2,
+                                MATRICULE_soustraiteure: 'SUSTR-002',
+                                NOM_soustraiteure: 'Silva',
+                                PRENOM_soustraiteure: 'Maria',
+                                FONCTION_soustraiteure: 'Conducteur',
+                                CONTACT_soustraiteure: 'maria.silva@logicargo.com',
+                                ENTREPRISE_soustraiteure: 'LogiCargo SA'
+                            }
+                        ];
+                    });
+            };
+
+            // Mettre à jour les statistiques
+            $scope.updateStatistics = function() {
+                $scope.statistics.total = $scope.equipes.length;
+                $scope.statistics.totalPersonnel = $scope.equipes.reduce(function(sum, equipe) {
+                    return sum + (equipe.personnel_count || 0);
+                }, 0);
+                $scope.statistics.totalSoustraitants = $scope.equipes.reduce(function(sum, equipe) {
+                    return sum + (equipe.soustraitants_count || 0);
+                }, 0);
+                $scope.statistics.equipesActives = $scope.equipes.filter(function(equipe) {
+                    return (equipe.personnel_count || 0) + (equipe.soustraitants_count || 0) > 0;
+                }).length;
+            };
+
+            // Filtrer les équipes
+            $scope.filterEquipes = function() {
+                $scope.filteredEquipes = $scope.equipes.filter(function(equipe) {
+                    var match = true;
+                    var totalMembers = (equipe.personnel_count || 0) + (equipe.soustraitants_count || 0);
+
+                    if ($scope.filters.id) {
+                        match = match && equipe.ID_equipe.toLowerCase().indexOf($scope.filters.id.toLowerCase()) !== -1;
+                    }
+                    if ($scope.filters.nom) {
+                        match = match && equipe.NOM_equipe.toLowerCase().indexOf($scope.filters.nom.toLowerCase()) !== -1;
+                    }
+                    if ($scope.filters.taille) {
+                        switch($scope.filters.taille) {
+                            case 'vide':
+                                match = match && totalMembers === 0;
+                                break;
+                            case 'petite':
+                                match = match && totalMembers >= 1 && totalMembers <= 5;
+                                break;
+                            case 'moyenne':
+                                match = match && totalMembers >= 6 && totalMembers <= 10;
+                                break;
+                            case 'grande':
+                                match = match && totalMembers >= 11;
+                                break;
+                        }
+                    }
+                    if ($scope.filters.global) {
+                        var global = $scope.filters.global.toLowerCase();
+                        match = match && (
+                            equipe.ID_equipe.toLowerCase().indexOf(global) !== -1 ||
+                            equipe.NOM_equipe.toLowerCase().indexOf(global) !== -1
+                        );
+                    }
+
+                    return match;
+                });
+
+                $scope.currentPage = 1;
+                $scope.updatePagination();
+            };
+
+            // Réinitialiser les filtres
+            $scope.resetFilters = function() {
+                $scope.filters = {
+                    id: '',
+                    nom: '',
+                    taille: '',
+                    global: ''
+                };
+                $scope.filteredEquipes = angular.copy($scope.equipes);
+                $scope.currentPage = 1;
+                $scope.updatePagination();
+            };
+
+            // Pagination
+            $scope.updatePagination = function() {
+                var start = ($scope.currentPage - 1) * $scope.itemsPerPage;
+                var end = start + $scope.itemsPerPage;
+                $scope.paginatedEquipes = $scope.filteredEquipes.slice(start, end);
+            };
+
+            $scope.setPage = function(page) {
+                var totalPages = $scope.getTotalPages();
+                if (page >= 1 && page <= totalPages) {
+                    $scope.currentPage = page;
+                    $scope.updatePagination();
+                }
+            };
+
+            $scope.getTotalPages = function() {
+                return Math.ceil($scope.filteredEquipes.length / $scope.itemsPerPage);
+            };
+
+            $scope.getPageNumbers = function() {
+                var totalPages = $scope.getTotalPages();
+                var startPage = Math.max(1, $scope.currentPage - 2);
+                var endPage = Math.min(totalPages, $scope.currentPage + 2);
+                var pages = [];
+                
+                for (var i = startPage; i <= endPage; i++) {
+                    pages.push(i);
+                }
+                return pages;
+            };
+
+            $scope.getDisplayRange = function() {
+                var start = ($scope.currentPage - 1) * $scope.itemsPerPage + 1;
+                var end = Math.min($scope.currentPage * $scope.itemsPerPage, $scope.filteredEquipes.length);
+                return start + ' à ' + end;
+            };
+
+            // Gestion des équipes
+            $scope.newEquipe = function() {
+                $scope.currentEquipe = {
+                    NOM_equipe: ''
+                };
+                $scope.editMode = false;
+            };
+
+            $scope.editEquipe = function(equipe) {
+                $scope.currentEquipe = angular.copy(equipe);
+                $scope.editMode = true;
+                
+                var modal = new bootstrap.Modal(document.getElementById('addEquipeModal'));
+                modal.show();
+            };
+
+            $scope.viewEquipe = function(equipe) {
+                var totalMembers = (equipe.personnel_count || 0) + (equipe.soustraitants_count || 0);
+                $scope.showAlert(
+                    'Équipe ' + equipe.NOM_equipe + ' (' + equipe.ID_equipe + ') - ' +
+                    'Personnel: ' + (equipe.personnel_count || 0) + ', ' +
+                    'Sous-traitants: ' + (equipe.soustraitants_count || 0) + ', ' +
+                    'Total: ' + totalMembers + ' membres',
+                    'info'
+                );
+            };
+
+            $scope.deleteEquipe = function(equipe) {
+                if (confirm('Êtes-vous sûr de vouloir supprimer l\'équipe ' + equipe.NOM_equipe + ' ?')) {
+                    $http.delete(API_BASE_URL + 'equipes.php?id=' + equipe.ID_equipe)
+                        .then(function(response) {
+                            if (response.data.success) {
+                                $scope.equipes = $scope.equipes.filter(function(e) {
+                                    return e.ID_equipe !== equipe.ID_equipe;
+                                });
+                                $scope.filterEquipes();
+                                $scope.updateStatistics();
+                                $scope.showAlert('Équipe ' + equipe.NOM_equipe + ' supprimée avec succès', 'success');
+                            } else {
+                                $scope.showAlert('Erreur lors de la suppression: ' + response.data.message, 'danger');
+                            }
+                        })
+                        .catch(function(error) {
+                            // Simulation locale
+                            $scope.equipes = $scope.equipes.filter(function(e) {
+                                return e.ID_equipe !== equipe.ID_equipe;
+                            });
+                            $scope.filterEquipes();
+                            $scope.updateStatistics();
+                            $scope.showAlert('Équipe ' + equipe.NOM_equipe + ' supprimée localement', 'warning');
+                        });
+                }
+            };
+
+            $scope.saveEquipe = function() {
+                if (!$scope.currentEquipe.NOM_equipe) {
+                    $scope.showAlert('Le nom de l\'équipe est obligatoire', 'warning');
+                    return;
+                }
+
+                var equipeData = angular.copy($scope.currentEquipe);
+
+                var apiCall;
+                if ($scope.editMode) {
+                    apiCall = $http.put(API_BASE_URL + 'equipes.php', equipeData);
+                } else {
+                    apiCall = $http.post(API_BASE_URL + 'equipes.php', equipeData);
+                }
+
+                apiCall.then(function(response) {
+                    if (response.data.success) {
+                        if ($scope.editMode) {
+                            var index = $scope.equipes.findIndex(function(e) {
+                                return e.ID_equipe === $scope.currentEquipe.ID_equipe;
+                            });
+                            if (index !== -1) {
+                                $scope.equipes[index] = equipeData;
+                            }
+                            $scope.showAlert('Équipe ' + equipeData.NOM_equipe + ' modifiée avec succès', 'success');
+                        } else {
+                            equipeData.ID_equipe = response.data.records.ID_equipe;
+                            equipeData.personnel_count = 0;
+                            equipeData.soustraitants_count = 0;
+                            $scope.equipes.push(equipeData);
+                            $scope.showAlert('Équipe ' + equipeData.NOM_equipe + ' créée avec succès', 'success');
+                        }
+                        
+                        $scope.filterEquipes();
+                        $scope.updateStatistics();
+                        
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('addEquipeModal'));
+                        modal.hide();
+                    } else {
+                        $scope.showAlert('Erreur API: ' + (response.data.message || 'Erreur inconnue'), 'danger');
+                    }
+                })
+                .catch(function(error) {
+                    // Simulation locale
+                    if ($scope.editMode) {
+                        var index = $scope.equipes.findIndex(function(e) {
+                            return e.ID_equipe === $scope.currentEquipe.ID_equipe;
+                        });
+                        if (index !== -1) {
+                            $scope.equipes[index] = equipeData;
+                        }
+                        $scope.showAlert('Équipe ' + equipeData.NOM_equipe + ' modifiée localement', 'warning');
+                    } else {
+                        equipeData.ID_equipe = 'EQ-' + String($scope.equipes.length + 1).padStart(3, '0');
+                        equipeData.personnel_count = 0;
+                        equipeData.soustraitants_count = 0;
+                        $scope.equipes.push(equipeData);
+                        $scope.showAlert('Équipe ' + equipeData.NOM_equipe + ' créée localement', 'warning');
+                    }
+                    
+                    $scope.filterEquipes();
+                    $scope.updateStatistics();
+                    
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('addEquipeModal'));
+                    modal.hide();
+                });
+            };
+
+            // Gestion des membres
+            $scope.manageMembers = function(equipe) {
+                $scope.selectedEquipe = angular.copy(equipe);
+                $scope.loadEquipeMembers(equipe.ID_equipe);
+                
+                var modal = new bootstrap.Modal(document.getElementById('membersModal'));
+                modal.show();
+            };
+
+            $scope.loadEquipeMembers = function(equipeId) {
+                // Charger personnel de l'équipe
+                $http.get(API_BASE_URL + 'equipes.php?action=personnel&id=' + equipeId)
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.equipePersonnel = response.data.records;
+                        }
+                    })
+                    .catch(function(error) {
+                        // Données de démonstration
+                        $scope.equipePersonnel = [
+                            {
+                                ID_personnel: 1,
+                                MATRICULE_personnel: 'MARMA-001',
+                                NOM_personnel: 'Alami',
+                                PRENOM_personnel: 'Ahmed',
+                                FONCTION_personnel: 'Chef d\'équipe',
+                                CONTACT_personnel: '06.12.34.56.78'
+                            }
+                        ];
+                    });
+
+                // Charger sous-traitants de l'équipe
+                $http.get(API_BASE_URL + 'equipes.php?action=soustraitants&id=' + equipeId)
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.equipeSoustraitants = response.data.records;
+                        }
+                    })
+                    .catch(function(error) {
+                        // Données de démonstration
+                        $scope.equipeSoustraitants = [
+                            {
+                                ID_soustraiteure: 1,
+                                MATRICULE_soustraiteure: 'SUSTR-001',
+                                NOM_soustraiteure: 'Garcia',
+                                PRENOM_soustraiteure: 'Carlos',
+                                FONCTION_soustraiteure: 'Opérateur',
+                                CONTACT_soustraiteure: '06.55.44.33.22',
+                                ENTREPRISE_soustraiteure: 'TransCargo SARL'
+                            }
+                        ];
+                    });
+            };
+
+            $scope.addPersonnelToEquipe = function() {
+                if (!$scope.selectedPersonnel) return;
+
+                var data = {
+                    equipe_id: $scope.selectedEquipe.ID_equipe,
+                    personnel_id: $scope.selectedPersonnel.ID_personnel,
+                    personnel_matricule: $scope.selectedPersonnel.MATRICULE_personnel
+                };
+
+                $http.post(API_BASE_URL + 'equipes.php?action=add_personnel', data)
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.showAlert('Personnel ajouté à l\'équipe avec succès', 'success');
+                            $scope.loadEquipeMembers($scope.selectedEquipe.ID_equipe);
+                            $scope.selectedPersonnel = null;
+                            $scope.loadEquipes();
+                        } else {
+                            $scope.showAlert('Erreur lors de l\'ajout: ' + response.data.message, 'danger');
+                        }
+                    })
+                    .catch(function(error) {
+                        // Simulation locale
+                        $scope.equipePersonnel.push($scope.selectedPersonnel);
+                        $scope.showAlert('Personnel ajouté à l\'équipe localement', 'warning');
+                        $scope.selectedPersonnel = null;
+                    });
+            };
+
+            $scope.removePersonnelFromEquipe = function(personnel) {
+                if (confirm('Retirer ' + personnel.PRENOM_personnel + ' ' + personnel.NOM_personnel + ' de l\'équipe ?')) {
+                    var data = {
+                        equipe_id: $scope.selectedEquipe.ID_equipe,
+                        personnel_id: personnel.ID_personnel,
+                        personnel_matricule: personnel.MATRICULE_personnel
+                    };
+
+                    $http.post(API_BASE_URL + 'equipes.php?action=remove_personnel', data)
+                        .then(function(response) {
+                            if (response.data.success) {
+                                $scope.showAlert('Personnel retiré de l\'équipe avec succès', 'success');
+                                $scope.loadEquipeMembers($scope.selectedEquipe.ID_equipe);
+                                $scope.loadEquipes();
+                            } else {
+                                $scope.showAlert('Erreur lors du retrait: ' + response.data.message, 'danger');
+                            }
+                        })
+                        .catch(function(error) {
+                            // Simulation locale
+                            $scope.equipePersonnel = $scope.equipePersonnel.filter(function(p) {
+                                return p.ID_personnel !== personnel.ID_personnel;
+                            });
+                            $scope.showAlert('Personnel retiré de l\'équipe localement', 'warning');
+                        });
+                }
+            };
+
+            $scope.addSoustraitantToEquipe = function() {
+                if (!$scope.selectedSoustraitant) return;
+
+                var data = {
+                    equipe_id: $scope.selectedEquipe.ID_equipe,
+                    soustraitant_id: $scope.selectedSoustraitant.ID_soustraiteure,
+                    soustraitant_matricule: $scope.selectedSoustraitant.MATRICULE_soustraiteure
+                };
+
+                $http.post(API_BASE_URL + 'equipes.php?action=add_soustraitant', data)
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.showAlert('Sous-traitant ajouté à l\'équipe avec succès', 'success');
+                            $scope.loadEquipeMembers($scope.selectedEquipe.ID_equipe);
+                            $scope.selectedSoustraitant = null;
+                            $scope.loadEquipes();
+                        } else {
+                            $scope.showAlert('Erreur lors de l\'ajout: ' + response.data.message, 'danger');
+                        }
+                    })
+                    .catch(function(error) {
+                        // Simulation locale
+                        $scope.equipeSoustraitants.push($scope.selectedSoustraitant);
+                        $scope.showAlert('Sous-traitant ajouté à l\'équipe localement', 'warning');
+                        $scope.selectedSoustraitant = null;
+                    });
+            };
+
+            $scope.removeSoustraitantFromEquipe = function(soustraitant) {
+                if (confirm('Retirer ' + soustraitant.PRENOM_soustraiteure + ' ' + soustraitant.NOM_soustraiteure + ' de l\'équipe ?')) {
+                    var data = {
+                        equipe_id: $scope.selectedEquipe.ID_equipe,
+                        soustraitant_id: soustraitant.ID_soustraiteure,
+                        soustraitant_matricule: soustraitant.MATRICULE_soustraiteure
+                    };
+
+                    $http.post(API_BASE_URL + 'equipes.php?action=remove_soustraitant', data)
+                        .then(function(response) {
+                            if (response.data.success) {
+                                $scope.showAlert('Sous-traitant retiré de l\'équipe avec succès', 'success');
+                                $scope.loadEquipeMembers($scope.selectedEquipe.ID_equipe);
+                                $scope.loadEquipes();
+                            } else {
+                                $scope.showAlert('Erreur lors du retrait: ' + response.data.message, 'danger');
+                            }
+                        })
+                        .catch(function(error) {
+                            // Simulation locale
+                            $scope.equipeSoustraitants = $scope.equipeSoustraitants.filter(function(s) {
+                                return s.ID_soustraiteure !== soustraitant.ID_soustraiteure;
+                            });
+                            $scope.showAlert('Sous-traitant retiré de l\'équipe localement', 'warning');
+                        });
+                }
+            };
+
+            // Export des données
+            $scope.exportData = function() {
+                var csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "ID,Nom,Personnel,Sous-traitants,Total,Statut\n";
+                
+                $scope.filteredEquipes.forEach(function(equipe) {
+                    var totalMembers = (equipe.personnel_count || 0) + (equipe.soustraitants_count || 0);
+                    csvContent += [
+                        equipe.ID_equipe,
+                        equipe.NOM_equipe,
+                        equipe.personnel_count || 0,
+                        equipe.soustraitants_count || 0,
+                        totalMembers,
+                        totalMembers > 0 ? 'Active' : 'Vide'
+                    ].join(',') + '\n';
+                });
+                
+                var encodedUri = encodeURI(csvContent);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "equipes_" + new Date().toISOString().slice(0, 10) + ".csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                $scope.showAlert('Données exportées avec succès', 'success');
+            };
+
+            // Système d'alertes
+            $scope.showAlert = function(message, type) {
+                $scope.alert = {
+                    show: true,
+                    type: type || 'info',
+                    message: message
+                };
+                
+                setTimeout(function() {
+                    $scope.hideAlert();
+                    $scope.$apply();
+                }, 5000);
+            };
+
+            $scope.hideAlert = function() {
+                $scope.alert.show = false;
+            };
+
+            // Déconnexion
+            $scope.logout = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = 'login.html';
+            };
+
+            // Initialisation automatique
+            $scope.init();
+
+            // Préparer nouvelle équipe au clic sur le bouton
+            setTimeout(function() {
+                var addButton = document.querySelector('[data-bs-target="#addEquipeModal"]');
+                if (addButton) {
+                    addButton.addEventListener('click', function() {
+                        $scope.newEquipe();
+                        $scope.$apply();
+                    });
+                }
+            }, 1000);
+        }]);
+    </script>
+</body>
+</html>

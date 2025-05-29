@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Utilisateurs</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body ng-controller="UsersController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-user-hard-hat"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper"></i> Arrêts
+                            </a>
+                        </li>
+                        <li class="nav-item" ng-show="isAdmin()">
+                            <a class="nav-link active" href="users.html">
+                                <i class="fas fa-user-cog"></i> Utilisateurs
+                            </a>
+                        </li>
+                    </ul>
+                    <button id="logoutButton" class="btn btn-danger btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-user-cog me-2"></i>Gestion des Utilisateurs</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="printData()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="fas fa-plus me-1"></i> Nouvel Utilisateur
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Total utilisateurs</h6>
+                                            <h2 class="my-2">{{stats.total}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>dans le système</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Administrateurs</h6>
+                                            <h2 class="my-2">{{stats.admins}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>comptes admin</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Utilisateurs</h6>
+                                            <h2 class="my-2">{{stats.users}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>comptes utilisateur</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-danger text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Comptes bloqués</h6>
+                                            <h2 class="my-2">{{stats.locked}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>nécessitent attention</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user-lock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="filterData()">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label for="searchId" class="form-label">ID</label>
+                                        <input type="text" class="form-control" id="searchId" ng-model="search.id" placeholder="Ex: USR-001">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchEmail" class="form-label">Email</label>
+                                        <input type="text" class="form-control" id="searchEmail" ng-model="search.email" placeholder="Email de l'utilisateur">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchRole" class="form-label">Rôle</label>
+                                        <select class="form-control" id="searchRole" ng-model="search.role">
+                                            <option value="">Tous</option>
+                                            <option value="ADMIN">Administrateur</option>
+                                            <option value="USER">Utilisateur</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchStatus" class="form-label">Statut</label>
+                                        <select class="form-control" id="searchStatus" ng-model="search.status">
+                                            <option value="">Tous</option>
+                                            <option value="active">Actif</option>
+                                            <option value="locked">Bloqué</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="searchGlobal" class="form-label">Recherche générale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchGlobal" ng-model="search.global" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" ng-click="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des utilisateurs -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Liste des Utilisateurs</h5>
+                            <span class="badge bg-primary">Total: {{filteredUsers.length}} utilisateurs</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Email</th>
+                                            <th>Rôle</th>
+                                            <th>Dernière connexion</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-if="loading">
+                                            <td colspan="6" class="text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="!loading && displayedUsers.length === 0">
+                                            <td colspan="6" class="text-center">Aucun utilisateur trouvé</td>
+                                        </tr>
+                                        <tr ng-repeat="user in displayedUsers">
+                                            <td>{{user.id}}</td>
+                                            <td>{{user.email}}</td>
+                                            <td>
+                                                <span class="badge" ng-class="{'bg-danger': user.role === 'ADMIN', 'bg-info': user.role === 'USER'}">
+                                                    {{user.role === 'ADMIN' ? 'Administrateur' : 'Utilisateur'}}
+                                                </span>
+                                            </td>
+                                            <td>{{user.last_login | date:'dd/MM/yyyy HH:mm' || 'Jamais connecté'}}</td>
+                                            <td>
+                                                <span class="badge" ng-class="{'bg-success': !user.account_locked, 'bg-danger': user.account_locked}">
+                                                    {{user.account_locked ? 'Bloqué' : 'Actif'}}
+                                                </span>
+                                                <span class="badge bg-warning ms-1" ng-if="user.failed_login_attempts > 0">
+                                                    {{user.failed_login_attempts}} tentatives
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-info" ng-click="viewUser(user)" title="Voir">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-primary" ng-click="editUser(user)" title="Modifier">
+                                                        <i class="fas fa-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm" ng-class="user.account_locked ? 'btn-outline-success' : 'btn-outline-warning'" 
+                                                            ng-click="toggleUserLock(user)" 
+                                                            title="{{user.account_locked ? 'Débloquer' : 'Bloquer'}}">
+                                                        <i class="fas" ng-class="user.account_locked ? 'fa-unlock' : 'fa-lock'"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-secondary" ng-click="resetPassword(user)" title="Réinitialiser mot de passe">
+                                                        <i class="fas fa-key"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" ng-click="confirmDeleteUser(user)" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Affichage {{(currentPage-1)*itemsPerPage + 1}}-{{Math.min(currentPage*itemsPerPage, filteredUsers.length)}} sur {{filteredUsers.length}} entrées</span>
+                            </div>
+                            <nav aria-label="Navigation des pages">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage - 1); $event.preventDefault()">&laquo;</a>
+                                    </li>
+                                    <li class="page-item" ng-repeat="page in getPages() track by $index" ng-class="{active: page === currentPage}">
+                                        <a class="page-link" href="#" ng-click="setPage(page); $event.preventDefault()">{{page}}</a>
+                                    </li>
+                                    <li class="page-item" ng-class="{disabled: currentPage === totalPages}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage + 1); $event.preventDefault()">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Utilisateur -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addUserModalLabel">Ajouter un nouvel utilisateur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="addForm" novalidate>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" ng-model="newUser.email" required ng-class="{'is-invalid': addForm.email.$invalid && addForm.email.$touched}">
+                            <div class="invalid-feedback" ng-show="addForm.email.$invalid && addForm.email.$touched">
+                                <span ng-show="addForm.email.$error.required">Veuillez saisir un email.</span>
+                                <span ng-show="addForm.email.$error.email">Veuillez saisir un email valide.</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" ng-model="newUser.password" required minlength="6" ng-class="{'is-invalid': addForm.password.$invalid && addForm.password.$touched}">
+                                <button class="btn btn-outline-secondary" type="button" ng-click="togglePasswordVisibility('password')">
+                                    <i class="fas" ng-class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" ng-show="addForm.password.$invalid && addForm.password.$touched">
+                                <span ng-show="addForm.password.$error.required">Veuillez saisir un mot de passe.</span>
+                                <span ng-show="addForm.password.$error.minlength">Le mot de passe doit contenir au moins 6 caractères.</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmer le mot de passe <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" ng-model="newUser.confirmPassword" required ng-class="{'is-invalid': (addForm.confirmPassword.$invalid && addForm.confirmPassword.$touched) || (newUser.password !== newUser.confirmPassword && addForm.confirmPassword.$touched)}">
+                            <div class="invalid-feedback" ng-show="(addForm.confirmPassword.$invalid && addForm.confirmPassword.$touched) || (newUser.password !== newUser.confirmPassword && addForm.confirmPassword.$touched)">
+                                <span ng-show="addForm.confirmPassword.$error.required">Veuillez confirmer le mot de passe.</span>
+                                <span ng-show="newUser.password !== newUser.confirmPassword && addForm.confirmPassword.$touched">Les mots de passe ne correspondent pas.</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Rôle <span class="text-danger">*</span></label>
+                            <select class="form-control" id="role" name="role" ng-model="newUser.role" required ng-class="{'is-invalid': addForm.role.$invalid && addForm.role.$touched}">
+                                <option value="">Sélectionner un rôle</option>
+                                <option value="USER">Utilisateur</option>
+                                <option value="ADMIN">Administrateur</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="addForm.role.$invalid && addForm.role.$touched">Veuillez sélectionner un rôle.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" ng-click="saveUser()" ng-disabled="addForm.$invalid || newUser.password !== newUser.confirmPassword">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modifier Utilisateur -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="editUserModalLabel">Modifier un utilisateur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="editForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">ID</label>
+                            <input type="text" class="form-control" ng-model="editUser.id" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="editEmail" name="editEmail" ng-model="editUser.email" required ng-class="{'is-invalid': editForm.editEmail.$invalid && editForm.editEmail.$touched}">
+                            <div class="invalid-feedback" ng-show="editForm.editEmail.$invalid && editForm.editEmail.$touched">
+                                <span ng-show="editForm.editEmail.$error.required">Veuillez saisir un email.</span>
+                                <span ng-show="editForm.editEmail.$error.email">Veuillez saisir un email valide.</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRole" class="form-label">Rôle <span class="text-danger">*</span></label>
+                            <select class="form-control" id="editRole" name="editRole" ng-model="editUser.role" required ng-class="{'is-invalid': editForm.editRole.$invalid && editForm.editRole.$touched}">
+                                <option value="USER">Utilisateur</option>
+                                <option value="ADMIN">Administrateur</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="editForm.editRole.$invalid && editForm.editRole.$touched">Veuillez sélectionner un rôle.</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="resetFailedAttempts" ng-model="editUser.resetFailedAttempts">
+                                <label class="form-check-label" for="resetFailedAttempts">
+                                    Réinitialiser les tentatives de connexion échouées
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-warning" ng-click="updateUser()" ng-disabled="editForm.$invalid">Mettre à jour</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Voir Utilisateur -->
+    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="viewUserModalLabel">Détails de l'utilisateur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">ID:</div>
+                        <div class="col-8">{{viewUser.id}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Email:</div>
+                        <div class="col-8">{{viewUser.email}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Rôle:</div>
+                        <div class="col-8">
+                            <span class="badge" ng-class="{'bg-danger': viewUser.role === 'ADMIN', 'bg-info': viewUser.role === 'USER'}">
+                                {{viewUser.role === 'ADMIN' ? 'Administrateur' : 'Utilisateur'}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Statut:</div>
+                        <div class="col-8">
+                            <span class="badge" ng-class="{'bg-success': !viewUser.account_locked, 'bg-danger': viewUser.account_locked}">
+                                {{viewUser.account_locked ? 'Bloqué' : 'Actif'}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Créé le:</div>
+                        <div class="col-8">{{viewUser.created_at | date:'dd/MM/yyyy HH:mm'}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Dernière connexion:</div>
+                        <div class="col-8">{{viewUser.last_login | date:'dd/MM/yyyy HH:mm' || 'Jamais connecté'}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Tentatives échouées:</div>
+                        <div class="col-8">
+                            <span class="badge" ng-class="{'bg-success': viewUser.failed_login_attempts === 0, 'bg-warning': viewUser.failed_login_attempts > 0}">
+                                {{viewUser.failed_login_attempts}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-2" ng-if="viewUser.account_locked_until">
+                        <div class="col-4 fw-bold">Bloqué jusqu'à:</div>
+                        <div class="col-8">{{viewUser.account_locked_until | date:'dd/MM/yyyy HH:mm'}}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-info text-white" ng-click="openEditFromView()">Modifier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Supprimer Utilisateur -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteUserModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer l'utilisateur {{deleteUser.email}} ?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Cette action est irréversible.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" ng-click="deleteUser()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Réinitialiser Mot de Passe -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">Réinitialiser le mot de passe</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Réinitialiser le mot de passe pour <strong>{{resetPasswordUser.email}}</strong> ?</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Un nouveau mot de passe temporaire sera généré et affiché après confirmation.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-warning" ng-click="confirmResetPassword()">Réinitialiser</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nouveau Mot de Passe -->
+    <div class="modal fade" id="newPasswordModal" tabindex="-1" aria-labelledby="newPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="newPasswordModalLabel">Nouveau mot de passe généré</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Le mot de passe a été réinitialisé avec succès pour <strong>{{resetPasswordUser.email}}</strong>.</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Nouveau mot de passe temporaire:</strong>
+                        <div class="mt-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{{newTempPassword}}" readonly>
+                                <button class="btn btn-outline-secondary" type="button" ng-click="copyToClipboard(newTempPassword)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted">L'utilisateur devra changer ce mot de passe lors de sa prochaine connexion.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Compris</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerte Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3">
+        <div ng-repeat="alert in alerts" class="alert alert-{{alert.type}} alert-dismissible fade show" role="alert">
+            {{alert.message}}
+            <button type="button" class="btn-close" ng-click="closeAlert($index)" aria-label="Fermer"></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="js/users.js"></script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Personnel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body ng-controller="PersonnelController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="personnel.html">
+                                <i class="fas fa-user-tie"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-user-hard-hat"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper"></i> Arrêts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="users.html">
+                                <i class="fas fa-hand-paper"></i> utilisateurs
+                            </a>
+                        </li>
+                    </ul>
+                    <button id="logoutButton" class="btn btn-danger btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-user-tie me-2"></i>Gestion du Personnel</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="exportData()">
+                                    <i class="fas fa-file-export me-1"></i> Exporter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" ng-click="printData()">
+                                    <i class="fas fa-print me-1"></i> Imprimer
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addPersonnelModal">
+                                <i class="fas fa-plus me-1"></i> Nouveau Personnel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Résumé des statistiques -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-4 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Personnel total</h6>
+                                            <h2 class="my-2">{{stats.total}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>employés permanents</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user-tie"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Fonction principale</h6>
+                                            <h2 class="my-2">{{stats.mainFunction}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>le plus grand groupe</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Dernier ajout</h6>
+                                            <h2 class="my-2">{{stats.lastAdded.name}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>{{stats.lastAdded.date}}</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres de recherche -->
+                    <div class="card mb-4 fade-in">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Filtres de recherche</h5>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="filterData()">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label for="searchMatricule" class="form-label">Matricule</label>
+                                        <input type="text" class="form-control" id="searchMatricule" ng-model="search.matricule" placeholder="Ex: MARMA-001">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchNom" class="form-label">Nom</label>
+                                        <input type="text" class="form-control" id="searchNom" ng-model="search.nom" placeholder="Nom de famille">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchFonction" class="form-label">Fonction</label>
+                                        <select class="form-select" id="searchFonction" ng-model="search.fonction">
+                                            <option value="">Toutes les fonctions</option>
+                                            <option value="Chef d'équipe">Chef d'équipe</option>
+                                            <option value="Grutier">Grutier</option>
+                                            <option value="Conducteur">Conducteur</option>
+                                            <option value="Manutentionnaire">Manutentionnaire</option>
+                                            <option value="Technicien">Technicien</option>
+                                            <option value="Administratif">Administratif</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="searchGlobal" class="form-label">Recherche générale</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchGlobal" ng-model="search.global" placeholder="Recherche...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" ng-click="resetFilters()">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau du personnel -->
+                    <div class="card mb-4 slide-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Liste du Personnel</h5>
+                            <span class="badge bg-primary">Total: {{filteredPersonnel.length}} employés</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Matricule</th>
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                            <th>Fonction</th>
+                                            <th>Contact</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-if="loading">
+                                            <td colspan="6" class="text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="!loading && displayedPersonnel.length === 0">
+                                            <td colspan="6" class="text-center">Aucun personnel trouvé</td>
+                                        </tr>
+                                        <tr ng-repeat="person in displayedPersonnel">
+                                            <td>{{person.MATRICULE_personnel}}</td>
+                                            <td>{{person.NOM_personnel}}</td>
+                                            <td>{{person.PRENOM_personnel}}</td>
+                                            <td>{{person.FONCTION_personnel}}</td>
+                                            <td>{{person.CONTACT_personnel || '-'}}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info me-1" ng-click="viewPersonnel(person)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary me-1" ng-click="editPersonnel(person)">
+                                                    <i class="fas fa-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="confirmDeletePersonnel(person)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Affichage {{(currentPage-1)*itemsPerPage + 1}}-{{Math.min(currentPage*itemsPerPage, filteredPersonnel.length)}} sur {{filteredPersonnel.length}} entrées</span>
+                            </div>
+                            <nav aria-label="Navigation des pages">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" ng-class="{disabled: currentPage === 1}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage - 1); $event.preventDefault()">&laquo;</a>
+                                    </li>
+                                    <li class="page-item" ng-repeat="page in getPages() track by $index" ng-class="{active: page === currentPage}">
+                                        <a class="page-link" href="#" ng-click="setPage(page); $event.preventDefault()">{{page}}</a>
+                                    </li>
+                                    <li class="page-item" ng-class="{disabled: currentPage === totalPages}">
+                                        <a class="page-link" href="#" ng-click="setPage(currentPage + 1); $event.preventDefault()">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- Graphique répartition par fonction -->
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <div class="card slide-in">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Répartition par fonction</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container" style="height: 300px;">
+                                        <canvas id="fonctionChart" chart-fonction="personnel"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Personnel -->
+    <div class="modal fade" id="addPersonnelModal" tabindex="-1" aria-labelledby="addPersonnelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addPersonnelModalLabel">Ajouter un nouveau membre du personnel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="addForm" novalidate>
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nom" name="nom" ng-model="newPersonnel.nom" required ng-class="{'is-invalid': addForm.nom.$invalid && addForm.nom.$touched}">
+                            <div class="invalid-feedback" ng-show="addForm.nom.$invalid && addForm.nom.$touched">Veuillez saisir un nom.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="prenom" name="prenom" ng-model="newPersonnel.prenom" required ng-class="{'is-invalid': addForm.prenom.$invalid && addForm.prenom.$touched}">
+                            <div class="invalid-feedback" ng-show="addForm.prenom.$invalid && addForm.prenom.$touched">Veuillez saisir un prénom.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fonction" class="form-label">Fonction <span class="text-danger">*</span></label>
+                            <select class="form-select" id="fonction" name="fonction" ng-model="newPersonnel.fonction" required ng-class="{'is-invalid': addForm.fonction.$invalid && addForm.fonction.$touched}">
+                                <option value="">Sélectionner une fonction</option>
+                                <option value="Chef d'équipe">Chef d'équipe</option>
+                                <option value="Grutier">Grutier</option>
+                                <option value="Conducteur">Conducteur</option>
+                                <option value="Manutentionnaire">Manutentionnaire</option>
+                                <option value="Technicien">Technicien</option>
+                                <option value="Administratif">Administratif</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="addForm.fonction.$invalid && addForm.fonction.$touched">Veuillez sélectionner une fonction.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contact" class="form-label">Contact</label>
+                            <input type="text" class="form-control" id="contact" ng-model="newPersonnel.contact" placeholder="Téléphone ou autre contact">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" ng-click="savePersonnel()" ng-disabled="addForm.$invalid">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modifier Personnel -->
+    <div class="modal fade" id="editPersonnelModal" tabindex="-1" aria-labelledby="editPersonnelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="editPersonnelModalLabel">Modifier un membre du personnel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="editForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Matricule</label>
+                            <input type="text" class="form-control" ng-model="editPersonnel.MATRICULE_personnel" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNom" class="form-label">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editNom" name="editNom" ng-model="editPersonnel.NOM_personnel" required ng-class="{'is-invalid': editForm.editNom.$invalid && editForm.editNom.$touched}">
+                            <div class="invalid-feedback" ng-show="editForm.editNom.$invalid && editForm.editNom.$touched">Veuillez saisir un nom.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPrenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editPrenom" name="editPrenom" ng-model="editPersonnel.PRENOM_personnel" required ng-class="{'is-invalid': editForm.editPrenom.$invalid && editForm.editPrenom.$touched}">
+                            <div class="invalid-feedback" ng-show="editForm.editPrenom.$invalid && editForm.editPrenom.$touched">Veuillez saisir un prénom.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFonction" class="form-label">Fonction <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editFonction" name="editFonction" ng-model="editPersonnel.FONCTION_personnel" required ng-class="{'is-invalid': editForm.editFonction.$invalid && editForm.editFonction.$touched}">
+                                <option value="">Sélectionner une fonction</option>
+                                <option value="Chef d'équipe">Chef d'équipe</option>
+                                <option value="Grutier">Grutier</option>
+                                <option value="Conducteur">Conducteur</option>
+                                <option value="Manutentionnaire">Manutentionnaire</option>
+                                <option value="Technicien">Technicien</option>
+                                <option value="Administratif">Administratif</option>
+                            </select>
+                            <div class="invalid-feedback" ng-show="editForm.editFonction.$invalid && editForm.editFonction.$touched">Veuillez sélectionner une fonction.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editContact" class="form-label">Contact</label>
+                            <input type="text" class="form-control" id="editContact" ng-model="editPersonnel.CONTACT_personnel" placeholder="Téléphone ou autre contact">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-warning" ng-click="updatePersonnel()" ng-disabled="editForm.$invalid">Mettre à jour</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Voir Personnel -->
+    <div class="modal fade" id="viewPersonnelModal" tabindex="-1" aria-labelledby="viewPersonnelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="viewPersonnelModalLabel">Détails du personnel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Matricule:</div>
+                        <div class="col-8">{{viewPersonnel.MATRICULE_personnel}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Nom:</div>
+                        <div class="col-8">{{viewPersonnel.NOM_personnel}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Prénom:</div>
+                        <div class="col-8">{{viewPersonnel.PRENOM_personnel}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Fonction:</div>
+                        <div class="col-8">{{viewPersonnel.FONCTION_personnel}}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Contact:</div>
+                        <div class="col-8">{{viewPersonnel.CONTACT_personnel || '-'}}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-info text-white" ng-click="openEditFromView()">Modifier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Supprimer Personnel -->
+    <div class="modal fade" id="deletePersonnelModal" tabindex="-1" aria-labelledby="deletePersonnelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deletePersonnelModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer {{deletePersonnel.PRENOM_personnel}} {{deletePersonnel.NOM_personnel}} ?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Cette action est irréversible.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" ng-click="deletePersonnel()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerte Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3">
+        <div ng-repeat="alert in alerts" class="alert alert-{{alert.type}} alert-dismissible fade show" role="alert">
+            {{alert.message}}
+            <button type="button" class="btn-close" ng-click="closeAlert($index)" aria-label="Fermer"></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="js/personnel.js"></script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="dashboardApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Tableau de Bord</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body ng-controller="DashboardController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="index.html">
+                                <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="operations.html">
+                                <i class="fas fa-cogs"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-user-hard-hat"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper"></i> Arrêts
+                            </a>
+                        </li>
+                        <li class="nav-item" ng-show="isAdmin()">
+                            <a class="nav-link" href="users.html">
+                                <i class="fas fa-user-cog"></i> Utilisateurs
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="user-info">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <small class="text-white-50">{{currentUser.email}}</small>
+                        </div>
+                        <button id="logoutButton" class="btn btn-danger btn-sm w-100">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête avec informations utilisateur -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div>
+                            <h1 class="h2"><i class="fas fa-chart-line me-2"></i>Tableau de Bord</h1>
+                            <p class="text-muted mb-0">Gestion portuaire en temps réel</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <small class="text-muted d-block">Connecté en tant que</small>
+                                    <span class="badge" ng-class="{'bg-danger': currentUser.role === 'ADMIN', 'bg-info': currentUser.role === 'USER'}">
+                                        {{currentUser.role === 'ADMIN' ? 'Administrateur' : 'Utilisateur'}}
+                                    </span>
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    {{currentDateTime | date:'dd/MM/yyyy'}}
+                                    <br>
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{currentDateTime | date:'HH:mm:ss'}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques principales -->
+                    <div class="row fade-in mb-4">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Navires en escale</h6>
+                                            <h2 class="my-2">{{stats.navires_en_escale}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small><i class="fas fa-arrow-up me-1"></i>+{{stats.nouveaux_navires}} aujourd'hui</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-ship"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Conteneurs traités</h6>
+                                            <h2 class="my-2">{{stats.conteneurs_traites}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small><i class="fas fa-percentage me-1"></i>{{stats.pourcentage_conteneurs}}% du mois</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Opérations actives</h6>
+                                            <h2 class="my-2">{{stats.operations_actives}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small><i class="fas fa-clock me-1"></i>{{stats.operations_en_cours}} en cours</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-cogs"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Personnel actif</h6>
+                                            <h2 class="my-2">{{stats.personnel_actif}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small><i class="fas fa-users me-1"></i>{{stats.equipes_actives}} équipes</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Graphiques et activités -->
+                    <div class="row">
+                        <!-- Graphique des opérations -->
+                        <div class="col-md-8 mb-4">
+                            <div class="card slide-in">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Activité des 7 derniers jours</h5>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary active" ng-click="setChartPeriod('week')">7 jours</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" ng-click="setChartPeriod('month')">30 jours</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="operationsChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alertes et notifications -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card slide-in">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Alertes</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="list-group list-group-flush">
+                                        <div ng-repeat="alert in alerts" class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">{{alert.title}}</div>
+                                                <small class="text-muted">{{alert.message}}</small>
+                                            </div>
+                                            <span class="badge" ng-class="{
+                                                'bg-danger': alert.priority === 'high',
+                                                'bg-warning': alert.priority === 'medium',
+                                                'bg-info': alert.priority === 'low'
+                                            }">
+                                                {{alert.time}}
+                                            </span>
+                                        </div>
+                                        <div ng-if="alerts.length === 0" class="list-group-item text-center text-muted">
+                                            <i class="fas fa-check-circle me-2"></i>Aucune alerte
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activités récentes -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card slide-in">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Activités récentes</h5>
+                                    <button class="btn btn-sm btn-outline-primary" ng-click="refreshActivities()">
+                                        <i class="fas fa-sync-alt" ng-class="{'fa-spin': refreshing}"></i> Actualiser
+                                    </button>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Heure</th>
+                                                    <th>Navire</th>
+                                                    <th>Opération</th>
+                                                    <th>Statut</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-if="loadingActivities">
+                                                    <td colspan="5" class="text-center">
+                                                        <div class="spinner-border text-primary" role="status">
+                                                            <span class="visually-hidden">Chargement...</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="!loadingActivities && activities.length === 0">
+                                                    <td colspan="5" class="text-center text-muted">Aucune activité récente</td>
+                                                </tr>
+                                                <tr ng-repeat="activity in activities | limitTo:10">
+                                                    <td>{{activity.heure}}</td>
+                                                    <td>
+                                                        <strong>{{activity.navire}}</strong>
+                                                        <br><small class="text-muted">{{activity.matricule}}</small>
+                                                    </td>
+                                                    <td>{{activity.operation}}</td>
+                                                    <td>
+                                                        <span class="badge" ng-class="{
+                                                            'bg-success': activity.statut === 'Terminé',
+                                                            'bg-primary': activity.statut === 'En cours',
+                                                            'bg-warning': activity.statut === 'En attente',
+                                                            'bg-danger': activity.statut === 'Arrêté'
+                                                        }">
+                                                            {{activity.statut}}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-info me-1" ng-click="viewActivity(activity)">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-primary" ng-click="editActivity(activity)">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-light">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted">
+                                                Dernière mise à jour: {{lastUpdate | date:'dd/MM/yyyy HH:mm'}}
+                                            </small>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <a href="operations.html" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-list me-1"></i> Voir toutes les opérations
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Raccourcis rapides -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card slide-in">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <a href="navires.html" class="btn btn-outline-primary w-100 p-3">
+                                                <i class="fas fa-ship fa-2x d-block mb-2"></i>
+                                                <span>Nouveau Navire</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <a href="escales.html" class="btn btn-outline-success w-100 p-3">
+                                                <i class="fas fa-anchor fa-2x d-block mb-2"></i>
+                                                <span>Nouvelle Escale</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <a href="operations.html" class="btn btn-outline-warning w-100 p-3">
+                                                <i class="fas fa-cogs fa-2x d-block mb-2"></i>
+                                                <span>Nouvelle Opération</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <a href="personnel.html" class="btn btn-outline-info w-100 p-3">
+                                                <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
+                                                <span>Nouveau Personnel</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Alerte Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3">
+        <div ng-repeat="notification in notifications" class="alert alert-{{notification.type}} alert-dismissible fade show" role="alert">
+            {{notification.message}}
+            <button type="button" class="btn-close" ng-click="closeNotification($index)" aria-label="Fermer"></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="js/auth-service.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

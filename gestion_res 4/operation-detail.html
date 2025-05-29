@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="gestionPortuaireApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Portuaire - Détail Opération</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a, #1e40af);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .table th {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            font-weight: 600;
+            border: none;
+            color: #495057;
+        }
+        .btn-group-sm .btn {
+            border-radius: 6px;
+            margin: 0 1px;
+        }
+        .icon-container {
+            opacity: 0.3;
+            font-size: 2.5rem;
+        }
+        .logo-container {
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .operation-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+        }
+        .nav-tabs .nav-link {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border-color: #007bff;
+        }
+        .tab-content {
+            background: white;
+            border-radius: 0 0 10px 10px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+        .member-badge {
+            margin: 2px;
+            font-size: 0.8rem;
+        }
+        .equipment-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .equipment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .add-item-card {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .add-item-card:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body ng-controller="OperationDetailController">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barre latérale -->
+            <div class="col-md-2 col-lg-2 sidebar">
+                <div class="sidebar-sticky">
+                    <div class="logo-container text-center">
+                        <i class="fas fa-anchor fa-2x text-white mb-2"></i>
+                        <h6 class="mt-2 text-white-50">Gestion Portuaire</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="navires.html">
+                                <i class="fas fa-ship me-2"></i> Navires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="escales.html">
+                                <i class="fas fa-anchor me-2"></i> Escales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="operations.html">
+                                <i class="fas fa-cogs me-2"></i> Opérations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="equipes.html">
+                                <i class="fas fa-users me-2"></i> Équipes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="personnel.html">
+                                <i class="fas fa-user-tie me-2"></i> Personnel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sous-traitants.html">
+                                <i class="fas fa-handshake me-2"></i> Sous-traitants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="shifts.html">
+                                <i class="fas fa-clock me-2"></i> Shifts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="engins.html">
+                                <i class="fas fa-truck-container me-2"></i> Engins
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="conteneurs.html">
+                                <i class="fas fa-box me-2"></i> Conteneurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="arrets.html">
+                                <i class="fas fa-hand-paper me-2"></i> Arrêts
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="mt-auto p-3">
+                        <button class="btn btn-danger btn-sm w-100" ng-click="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="container-fluid">
+                    <!-- En-tête de page -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div>
+                            <h1 class="h2">
+                                <i class="fas fa-cogs me-2 text-primary"></i>Opération: {{operation.ID_operation}}
+                            </h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="operations.html">Opérations</a></li>
+                                    <li class="breadcrumb-item active">Détails {{operation.ID_operation}}</li>
+                                </ol>
+                            </nav>
+                        </div>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <a href="operations.html" class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary me-2" ng-click="exportData()">
+                                <i class="fas fa-file-export me-1"></i> Exporter
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                                <i class="fas fa-print me-1"></i> Imprimer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alertes -->
+                    <div id="alertContainer">
+                        <div ng-show="alert.show" class="alert alert-{{alert.type}} alert-dismissible fade show">
+                            {{alert.message}}
+                            <button type="button" class="btn-close" ng-click="hideAlert()"></button>
+                        </div>
+                    </div>
+
+                    <!-- En-tête d'opération -->
+                    <div class="operation-header fade-in">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="mb-1">
+                                    <i ng-class="getOperationIcon(operation.TYPE_operation)" class="me-2"></i>
+                                    {{operation.TYPE_operation}}
+                                    <span ng-if="operation.ID_escale" class="badge bg-light text-dark ms-2">Escale: {{operation.ID_escale}}</span>
+                                </h3>
+                                <p class="mb-1" ng-if="operation.NOM_navire">
+                                    <i class="fas fa-ship me-2"></i>Navire: <strong>{{operation.NOM_navire}}</strong>
+                                </p>
+                                <p class="mb-0" ng-if="operation.DATE_debut">
+                                    <i class="fas fa-clock me-2"></i>Démarré le: {{formatDateTime(operation.DATE_debut)}}
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-light" ng-click="showEditModal()">
+                                        <i class="fas fa-edit me-1"></i> Modifier l'opération
+                                    </button>
+                                    <span class="badge" ng-class="getStatusBadgeClass()" style="font-size: 1rem; padding: 0.5rem;">
+                                        {{operation.status || 'Non défini'}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques -->
+                    <div class="row mb-4 slide-in">
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Personnel</h6>
+                                            <h2 class="my-2">{{statistics.personnel}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>assignés</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Conteneurs</h6>
+                                            <h2 class="my-2">{{statistics.conteneurs}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>à traiter</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Équipements</h6>
+                                            <h2 class="my-2">{{statistics.equipements}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>utilisés</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-tools"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card stat-card bg-warning text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-0">Arrêts</h6>
+                                            <h2 class="my-2">{{statistics.arrets}}</h2>
+                                            <p class="card-text mb-0">
+                                                <small>déclarés</small>
+                                            </p>
+                                        </div>
+                                        <div class="icon-container">
+                                            <i class="fas fa-hand-paper"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Onglets de navigation -->
+                    <ul class="nav nav-tabs mb-0" id="operationTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                                <i class="fas fa-info-circle me-1"></i> Informations
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="personnel-tab" data-bs-toggle="tab" data-bs-target="#personnel" type="button" role="tab">
+                                <i class="fas fa-users me-1"></i> Personnel ({{personnel.length}})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="conteneurs-tab" data-bs-toggle="tab" data-bs-target="#conteneurs" type="button" role="tab">
+                                <i class="fas fa-box me-1"></i> Conteneurs ({{conteneurs.length}})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="equipements-tab" data-bs-toggle="tab" data-bs-target="#equipements" type="button" role="tab">
+                                <i class="fas fa-tools me-1"></i> Équipements ({{equipements.length}})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="arrets-tab" data-bs-toggle="tab" data-bs-target="#arrets" type="button" role="tab">
+                                <i class="fas fa-hand-paper me-1"></i> Arrêts ({{arrets.length}})
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Contenu des onglets -->
+                    <div class="tab-content p-4" id="operationTabsContent">
+                        <!-- Onglet Informations -->
+                        <div class="tab-pane fade show active" id="info" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-info-circle me-2"></i>Détails de l'opération
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-sm table-borderless">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold">ID Opération:</td>
+                                                        <td>{{operation.ID_operation}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Type:</td>
+                                                        <td>
+                                                            <i ng-class="getOperationIcon(operation.TYPE_operation)" class="me-2 text-primary"></i>
+                                                            {{operation.TYPE_operation}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Escale:</td>
+                                                        <td>{{operation.ID_escale || '-'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Navire:</td>
+                                                        <td>{{operation.NOM_navire || '-'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Équipe:</td>
+                                                        <td>{{operation.NOM_equipe || '-'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Shift:</td>
+                                                        <td>{{operation.NOM_shift || '-'}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-calendar-alt me-2"></i>Planification
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-sm table-borderless">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold">Date début:</td>
+                                                        <td>{{formatDateTime(operation.DATE_debut) || '-'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Date fin:</td>
+                                                        <td>{{formatDateTime(operation.DATE_fin) || '-'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Durée prévue:</td>
+                                                        <td>{{calculateDuration() || '-'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold">Statut:</td>
+                                                        <td>
+                                                            <span class="badge" ng-class="getStatusBadgeClass()">
+                                                                {{operation.status || 'Non défini'}}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet Personnel -->
+                        <div class="tab-pane fade" id="personnel" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-users me-2 text-primary"></i>Personnel assigné</h5>
+                                <button class="btn btn-primary" ng-click="showAddPersonnelModal()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter Personnel
+                                </button>
+                            </div>
+                            
+                            <div ng-if="personnel.length === 0" class="text-center py-5">
+                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                <h5>Aucun personnel assigné</h5>
+                                <p class="text-muted">Aucun personnel n'est encore assigné à cette opération.</p>
+                                <button class="btn btn-primary" ng-click="showAddPersonnelModal()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter le premier personnel
+                                </button>
+                            </div>
+                            
+                            <div ng-if="personnel.length > 0" class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Matricule</th>
+                                            <th>Nom complet</th>
+                                            <th>Fonction</th>
+                                            <th>Contact</th>
+                                            <th>Type</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="person in personnel">
+                                            <td><span class="badge bg-primary">{{person.matricule}}</span></td>
+                                            <td>{{person.nom}} {{person.prenom}}</td>
+                                            <td><span class="badge bg-info">{{person.fonction}}</span></td>
+                                            <td>{{person.contact || '-'}}</td>
+                                            <td>
+                                                <span class="badge" ng-class="person.type === 'Personnel' ? 'bg-success' : 'bg-warning'">
+                                                    {{person.type}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-danger" ng-click="removePersonnel(person)" title="Retirer">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Onglet Conteneurs -->
+                        <div class="tab-pane fade" id="conteneurs" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-box me-2 text-success"></i>Conteneurs assignés</h5>
+                                <button class="btn btn-success" ng-click="showAddConteneurModal()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter Conteneur
+                                </button>
+                            </div>
+                            
+                            <div ng-if="conteneurs.length === 0" class="text-center py-5">
+                                <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                                <h5>Aucun conteneur assigné</h5>
+                                <p class="text-muted">Aucun conteneur n'est encore assigné à cette opération.</p>
+                                <button class="btn btn-success" ng-click="showAddConteneurModal()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter le premier conteneur
+                                </button>
+                            </div>
+                            
+                            <div ng-if="conteneurs.length > 0" class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID Conteneur</th>
+                                            <th>Nom</th>
+                                            <th>Type</th>
+                                            <th>Statut</th>
+                                            <th>Date ajout</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="conteneur in conteneurs">
+                                            <td><span class="badge bg-success">{{conteneur.ID_conteneure}}</span></td>
+                                            <td>{{conteneur.NOM_conteneure}}</td>
+                                            <td><span class="badge bg-info">{{conteneur.TYPE_conteneure}}</span></td>
+                                            <td>
+                                                <span class="badge bg-warning">En cours</span>
+                                            </td>
+                                            <td>{{formatDateTime(conteneur.DATE_AJOUT)}}</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary" ng-click="editConteneur(conteneur)" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger" ng-click="removeConteneur(conteneur)" title="Retirer">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Onglet Équipements -->
+                        <div class="tab-pane fade" id="equipements" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-tools me-2 text-info"></i>Équipements utilisés</h5>
+                                <button class="btn btn-info" ng-click="showAddEquipementModal()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter Équipement
+                                </button>
+                            </div>
+                            
+                            <div ng-if="equipements.length === 0" class="text-center py-5">
+                                <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+                                <h5>Aucun équipement assigné</h5>
+                                <p class="text-muted">Aucun équipement n'est encore assigné à cette opération.</p>
+                                <button class="btn btn-info" ng-click="showAddEquipementModal()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter le premier équipement
+                                </button>
+                            </div>
+                            
+                            <div ng-if="equipements.length > 0" class="row">
+                                <div ng-repeat="equipement in equipements" class="col-md-4 mb-3">
+                                    <div class="card equipment-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">
+                                                        <i class="fas fa-wrench me-2 text-info"></i>{{equipement.NOM_engin}}
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        <span class="badge bg-secondary">{{equipement.TYPE_engin}}</span><br>
+                                                        <small class="text-muted">ID: {{equipement.ID_engin}}</small>
+                                                    </p>
+                                                </div>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-danger" ng-click="removeEquipement(equipement)" title="Retirer">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet Arrêts -->
+                        <div class="tab-pane fade" id="arrets" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-hand-paper me-2 text-warning"></i>Arrêts déclarés</h5>
+                                <button class="btn btn-warning" ng-click="showAddArretModal()">
+                                    <i class="fas fa-plus me-1"></i> Déclarer Arrêt
+                                </button>
+                            </div>
+                            
+                            <div ng-if="arrets.length === 0" class="text-center py-5">
+                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                <h5>Aucun arrêt déclaré</h5>
+                                <p class="text-muted">Cette opération se déroule sans interruption.</p>
+                                <button class="btn btn-warning" ng-click="showAddArretModal()">
+                                    <i class="fas fa-plus me-1"></i> Déclarer le premier arrêt
+                                </button>
+                            </div>
+                            
+                            <div ng-if="arrets.length > 0" class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID Arrêt</th>
+                                            <th>Motif</th>
+                                            <th>Date début</th>
+                                            <th>Date fin</th>
+                                            <th>Durée</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="arret in arrets">
+                                            <td><span class="badge bg-warning">{{arret.ID_arret}}</span></td>
+                                            <td>{{arret.MOTIF_arret}}</td>
+                                            <td>{{formatDateTime(arret.DATE_DEBUT_arret)}}</td>
+                                            <td>{{formatDateTime(arret.DATE_FIN_arret)}}</td>
+                                            <td>
+                                                <span class="badge bg-danger">{{formatDuration(arret.DURE_arret)}}</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary" ng-click="editArret(arret)" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger" ng-click="removeArret(arret)" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Modification d'opération -->
+    <div class="modal fade" id="editOperationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Modifier l'opération
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Type d'opération</label>
+                                <select class="form-select" ng-model="editForm.TYPE_operation">
+                                    <option value="Chargement">Chargement</option>
+                                    <option value="Déchargement">Déchargement</option>
+                                    <option value="Transbordement">Transbordement</option>
+                                    <option value="Stockage">Stockage</option>
+                                    <option value="Manutention">Manutention</option>
+                                    <option value="Inspection">Inspection</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select" ng-model="editForm.status">
+                                    <option value="En attente">En attente</option>
+                                    <option value="En cours">En cours</option>
+                                    <option value="Terminée">Terminée</option>
+                                    <option value="Suspendue">Suspendue</option>
+                                    <option value="Annulée">Annulée</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date de début</label>
+                                <input type="datetime-local" class="form-control" ng-model="editForm.DATE_debut">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date de fin</label>
+                                <input type="datetime-local" class="form-control" ng-model="editForm.DATE_fin">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="updateOperation()">
+                        <i class="fas fa-save me-1"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Personnel - VERSION CORRIGÉE -->
+    <div class="modal fade" id="addPersonnelModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Ajouter Personnel
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- DEBUG INFO (retirez en production) -->
+                    <div class="alert alert-info mb-3">
+                        <small>
+                            Debug: Personnel disponible: {{availablePersonnel.length}} | 
+                            Sous-traitants: {{availableSoustraitants.length}}
+                        </small>
+                    </div>
+
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#personnel-interne" type="button" role="tab">
+                                Personnel interne ({{availablePersonnel.length}})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#sous-traitants" type="button" role="tab">
+                                Sous-traitants ({{availableSoustraitants.length}})
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="personnel-interne" role="tabpanel">
+                            <div class="mb-3">
+                                <label class="form-label">Sélectionner un personnel</label>
+                                <!-- ⭐ CORRECTION PRINCIPALE ICI ⭐ -->
+                                <select class="form-select" ng-model="personnelForm.selected" 
+                                        ng-options="p as (p.MATRICULE_personnel + ' - ' + p.NOM_personnel + ' ' + p.PRENOM_personnel + ' (' + p.FONCTION_personnel + ')') for p in availablePersonnel track by p.ID_personnel">
+                                    <option value="">Choisir un personnel...</option>
+                                </select>
+                                
+                                <!-- Affichage debug -->
+                                <small class="text-muted d-block mt-1">
+                                    Sélectionné: {{personnelForm.selected.NOM_personnel || 'Aucun'}}
+                                </small>
+                            </div>
+
+                            <!-- Prévisualisation -->
+                            <div class="card bg-light" ng-show="personnelForm.selected">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title">Aperçu de la sélection</h6>
+                                    <p class="card-text mb-0">
+                                        <strong>Matricule:</strong> {{personnelForm.selected.MATRICULE_personnel}}<br>
+                                        <strong>Nom:</strong> {{personnelForm.selected.NOM_personnel}} {{personnelForm.selected.PRENOM_personnel}}<br>
+                                        <strong>Fonction:</strong> {{personnelForm.selected.FONCTION_personnel}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="sous-traitants" role="tabpanel">
+                            <div class="mb-3">
+                                <label class="form-label">Sélectionner un sous-traitant</label>
+                                <!-- ⭐ CORRECTION PRINCIPALE ICI ⭐ -->
+                                <select class="form-select" ng-model="soustraitantForm.selected"
+                                        ng-options="s as (s.MATRICULE_soustraiteure + ' - ' + s.NOM_soustraiteure + ' ' + s.PRENOM_soustraiteure + ' (' + s.ENTREPRISE_soustraiteure + ')') for s in availableSoustraitants track by s.ID_soustraiteure">
+                                    <option value="">Choisir un sous-traitant...</option>
+                                </select>
+                                
+                                <!-- Affichage debug -->
+                                <small class="text-muted d-block mt-1">
+                                    Sélectionné: {{soustraitantForm.selected.NOM_soustraiteure || 'Aucun'}}
+                                </small>
+                            </div>
+
+                            <!-- Prévisualisation -->
+                            <div class="card bg-light" ng-show="soustraitantForm.selected">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title">Aperçu de la sélection</h6>
+                                    <p class="card-text mb-0">
+                                        <strong>Matricule:</strong> {{soustraitantForm.selected.MATRICULE_soustraiteure}}<br>
+                                        <strong>Nom:</strong> {{soustraitantForm.selected.NOM_soustraiteure}} {{soustraitantForm.selected.PRENOM_soustraiteure}}<br>
+                                        <strong>Entreprise:</strong> {{soustraitantForm.selected.ENTREPRISE_soustraiteure}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="addPersonnel()" 
+                            ng-disabled="!personnelForm.selected && !soustraitantForm.selected">
+                        <i class="fas fa-plus me-1"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Conteneur -->
+    <div class="modal fade" id="addConteneurModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-box me-2"></i>Ajouter Conteneur
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sélectionner un conteneur</label>
+                        <select class="form-select" ng-model="conteneurForm.selected"
+                                ng-options="c as (c.ID_conteneure + ' - ' + c.NOM_conteneure + ' (' + c.TYPE_conteneure + ')') for c in availableConteneurs track by c.ID_conteneure">
+                            <option value="">Choisir un conteneur...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" ng-if="conteneurForm.selected">
+                        <div class="card bg-light">
+                            <div class="card-body p-3">
+                                <h6 class="card-title">Détails du conteneur</h6>
+                                <p class="card-text mb-0">
+                                    <strong>Type:</strong> {{conteneurForm.selected.TYPE_conteneure}}<br>
+                                    <strong>Navire:</strong> {{conteneurForm.selected.ID_navire || 'Non assigné'}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-success" ng-click="addConteneur()">
+                        <i class="fas fa-plus me-1"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Équipement -->
+    <div class="modal fade" id="addEquipementModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-tools me-2"></i>Ajouter Équipement
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sélectionner un équipement</label>
+                        <select class="form-select" ng-model="equipementForm.selected"
+                                ng-options="e as (e.ID_engin + ' - ' + e.NOM_engin + ' (' + e.TYPE_engin + ')') for e in availableEquipements track by e.ID_engin">
+                            <option value="">Choisir un équipement...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" ng-if="equipementForm.selected">
+                        <div class="card bg-light">
+                            <div class="card-body p-3">
+                                <h6 class="card-title">Détails de l'équipement</h6>
+                                <p class="card-text mb-0">
+                                    <strong>Type:</strong> {{equipementForm.selected.TYPE_engin}}<br>
+                                    <strong>Nom:</strong> {{equipementForm.selected.NOM_engin}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-info" ng-click="addEquipement()">
+                        <i class="fas fa-plus me-1"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Arrêt -->
+    <div class="modal fade" id="addArretModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-hand-paper me-2"></i>Déclarer un Arrêt
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Motif de l'arrêt *</label>
+                            <select class="form-select" ng-model="arretForm.MOTIF_arret" required>
+                                <option value="">Sélectionnez un motif</option>
+                                <option value="Panne équipement">Panne équipement</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Pause">Pause</option>
+                                <option value="Intempéries">Intempéries</option>
+                                <option value="Problème sécurité">Problème sécurité</option>
+                                <option value="Attente navire">Attente navire</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date de début *</label>
+                                <input type="datetime-local" class="form-control" ng-model="arretForm.DATE_DEBUT_arret" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date de fin</label>
+                                <input type="datetime-local" class="form-control" ng-model="arretForm.DATE_FIN_arret">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Durée (en minutes)</label>
+                            <input type="number" class="form-control" ng-model="arretForm.DURE_arret" min="1" placeholder="Calculée automatiquement">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-warning" ng-click="addArret()">
+                        <i class="fas fa-save me-1"></i>Déclarer l'arrêt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script>
+        // Application AngularJS
+        var app = angular.module('gestionPortuaireApp', []);
+
+        // Contrôleur principal pour le détail d'opération
+        app.controller('OperationDetailController', ['$scope', '$http', function($scope, $http) {
+            // Variables
+            $scope.operation = {};
+            $scope.personnel = [];
+            $scope.conteneurs = [];
+            $scope.equipements = [];
+            $scope.arrets = [];
+            $scope.loading = true;
+            
+            // Données disponibles pour ajout
+            $scope.availablePersonnel = [];
+            $scope.availableSoustraitants = [];
+            $scope.availableConteneurs = [];
+            $scope.availableEquipements = [];
+            
+            // Formulaires
+            $scope.editForm = {};
+            $scope.personnelForm = { selected: null };
+            $scope.soustraitantForm = { selected: null };
+            $scope.conteneurForm = { selected: null };
+            $scope.equipementForm = { selected: null };
+            $scope.arretForm = {};
+
+            // Statistiques
+            $scope.statistics = {
+                personnel: 0,
+                conteneurs: 0,
+                equipements: 0,
+                arrets: 0
+            };
+
+            // Alertes
+            $scope.alert = {
+                show: false,
+                type: 'info',
+                message: ''
+            };
+
+            // API Base URL
+            var API_BASE_URL = 'api/';
+
+            // Initialisation
+            $scope.init = function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const id = urlParams.get('id');
+                
+                if (!id) {
+                    window.location.href = 'operations.html';
+                    return;
+                }
+                
+                $scope.loadOperationDetails(id);
+                $scope.loadAvailableData();
+            };
+
+            // Charger les détails de l'opération
+            $scope.loadOperationDetails = function(id) {
+                $http.get(API_BASE_URL + 'operations.php?id=' + id)
+                    .then(function(response) {
+                        if (response.data.success) {
+                            $scope.operation = response.data.record;
+                        } else {
+                            throw new Error('API Error');
+                        }
+                    })
+                    .catch(function(error) {
+                        // Données de démonstration
+                        $scope.operation = {
+                            ID_operation: id,
+                            TYPE_operation: 'Chargement',
+                            ID_escale: 'ESC-001',
+                            NOM_navire: 'MSC MARINA',
+                            NOM_equipe: 'Équipe Alpha',
+                            NOM_shift: 'Shift Matin',
+                            status: 'En cours',
+                            DATE_debut: '2025-05-27T08:00:00',
+                            DATE_fin: '2025-05-27T16:00:00'
+                        };
+                        
+                        // Données de démonstration pour les éléments
+                        $scope.personnel = [
+                            {
+                                matricule: 'MARMA-001',
+                                nom: 'Alami',
+                                prenom: 'Ahmed',
+                                fonction: 'Chef d\'équipe',
+                                contact: '06.12.34.56.78',
+                                type: 'Personnel'
+                            },
+                            {
+                                matricule: 'SUSTR-001',
+                                nom: 'Garcia',
+                                prenom: 'Carlos',
+                                fonction: 'Opérateur',
+                                contact: '06.55.44.33.22',
+                                type: 'Sous-traitant'
+                            }
+                        ];
+                        
+                        $scope.conteneurs = [
+                            {
+                                ID_conteneure: 'CTR-001',
+                                NOM_conteneure: 'Conteneur A1',
+                                TYPE_conteneure: '20 pieds',
+                                DATE_AJOUT: new Date().toISOString()
+                            },
+                            {
+                                ID_conteneure: 'CTR-002',
+                                NOM_conteneure: 'Conteneur B2',
+                                TYPE_conteneure: '40 pieds',
+                                DATE_AJOUT: new Date().toISOString()
+                            }
+                        ];
+                        
+                        $scope.equipements = [
+                            {
+                                ID_engin: 'ENG-001',
+                                NOM_engin: 'Grue Portuaire #1',
+                                TYPE_engin: 'Grue'
+                            },
+                            {
+                                ID_engin: 'ENG-002',
+                                NOM_engin: 'Chariot élévateur #3',
+                                TYPE_engin: 'Chariot élévateur'
+                            }
+                        ];
+                        
+                        $scope.arrets = [
+                            {
+                                ID_arret: 'AR-001',
+                                MOTIF_arret: 'Pause',
+                                DATE_DEBUT_arret: '2025-05-27T10:00:00',
+                                DATE_FIN_arret: '2025-05-27T10:15:00',
+                                DURE_arret: 15
+                            }
+                        ];
+                        
+                        $scope.updateStatistics();
+                    })
+                    .finally(function() {
+                        $scope.loading = false;
+                    });
+            };
+
+            // ⭐ FONCTION CORRIGÉE - Charger les données disponibles ⭐
+            $scope.loadAvailableData = function() {
+                console.log('🔄 Chargement forcé des données...');
+                
+                // DONNÉES FORCÉES - Personnel disponible
+                $scope.availablePersonnel = [
+                    {
+                        ID_personnel: 1,
+                        MATRICULE_personnel: 'MARMA-003',
+                        NOM_personnel: 'Benali',
+                        PRENOM_personnel: 'Fatima',
+                        FONCTION_personnel: 'Opérateur',
+                        CONTACT_personnel: '06.23.45.67.89'
+                    },
+                    {
+                        ID_personnel: 2,
+                        MATRICULE_personnel: 'MARMA-004',
+                        NOM_personnel: 'Chahbi',
+                        PRENOM_personnel: 'Omar',
+                        FONCTION_personnel: 'Technicien',
+                        CONTACT_personnel: '06.34.56.78.90'
+                    },
+                    {
+                        ID_personnel: 3,
+                        MATRICULE_personnel: 'MARMA-005',
+                        NOM_personnel: 'Dakir',
+                        PRENOM_personnel: 'Aicha',
+                        FONCTION_personnel: 'Conducteur',
+                        CONTACT_personnel: '06.45.67.89.01'
+                    }
+                ];
+
+                // DONNÉES FORCÉES - Sous-traitants disponibles
+                $scope.availableSoustraitants = [
+                    {
+                        ID_soustraiteure: 1,
+                        MATRICULE_soustraiteure: 'SUSTR-003',
+                        NOM_soustraiteure: 'Silva',
+                        PRENOM_soustraiteure: 'Maria',
+                        FONCTION_soustraiteure: 'Conducteur',
+                        CONTACT_soustraiteure: '06.66.55.44.33',
+                        ENTREPRISE_soustraiteure: 'LogiCargo SA'
+                    },
+                    {
+                        ID_soustraiteure: 2,
+                        MATRICULE_soustraiteure: 'SUSTR-004',
+                        NOM_soustraiteure: 'Johnson',
+                        PRENOM_soustraiteure: 'David',
+                        FONCTION_soustraiteure: 'Technicien',
+                        CONTACT_soustraiteure: '06.77.66.55.44',
+                        ENTREPRISE_soustraiteure: 'Maritime Services'
+                    }
+                ];
+
+                // DONNÉES FORCÉES - Conteneurs disponibles
+                $scope.availableConteneurs = [
+                    {
+                        ID_conteneure: 'CTR-003',
+                        NOM_conteneure: 'Conteneur C3',
+                        TYPE_conteneure: '20 pieds',
+                        ID_navire: null
+                    },
+                    {
+                        ID_conteneure: 'CTR-004',
+                        NOM_conteneure: 'Conteneur D4',
+                        TYPE_conteneure: '40 pieds',
+                        ID_navire: null
+                    }
+                ];
+
+                // DONNÉES FORCÉES - Équipements disponibles
+                $scope.availableEquipements = [
+                    {
+                        ID_engin: 'ENG-003',
+                        NOM_engin: 'Grue Mobile #2',
+                        TYPE_engin: 'Grue'
+                    },
+                    {
+                        ID_engin: 'ENG-004',
+                        NOM_engin: 'Tracteur Terminal',
+                        TYPE_engin: 'Tracteur'
+                    }
+                ];
+
+                console.log('✅ Données forcées chargées:', {
+                    personnel: $scope.availablePersonnel.length,
+                    soustraitants: $scope.availableSoustraitants.length,
+                    conteneurs: $scope.availableConteneurs.length,
+                    equipements: $scope.availableEquipements.length
+                });
+
+                // Forcer l'application du scope
+                if (!$scope.$phase) {
+                    $scope.$apply();
+                }
+            };
+
+            // Mettre à jour les statistiques
+            $scope.updateStatistics = function() {
+                $scope.statistics = {
+                    personnel: $scope.personnel.length,
+                    conteneurs: $scope.conteneurs.length,
+                    equipements: $scope.equipements.length,
+                    arrets: $scope.arrets.length
+                };
+            };
+
+            // Utilitaires de formatage
+            $scope.formatDateTime = function(dateTime) {
+                if (!dateTime) return null;
+                const date = new Date(dateTime);
+                return date.toLocaleString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+
+            $scope.formatDuration = function(minutes) {
+                if (!minutes) return '0h 0m';
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return hours + 'h ' + mins + 'm';
+            };
+
+            $scope.calculateDuration = function() {
+                if (!$scope.operation.DATE_debut || !$scope.operation.DATE_fin) return null;
+                const debut = new Date($scope.operation.DATE_debut);
+                const fin = new Date($scope.operation.DATE_fin);
+                const diffMinutes = Math.round((fin - debut) / 60000);
+                return $scope.formatDuration(diffMinutes);
+            };
+
+            $scope.getStatusBadgeClass = function() {
+                if (!$scope.operation.status) return 'bg-secondary';
+                switch ($scope.operation.status.toLowerCase()) {
+                    case 'en cours': return 'bg-primary';
+                    case 'terminée': return 'bg-success';
+                    case 'en attente': return 'bg-warning';
+                    case 'suspendue': return 'bg-info';
+                    case 'annulée': return 'bg-danger';
+                    default: return 'bg-secondary';
+                }
+            };
+
+            $scope.getOperationIcon = function(type) {
+                switch (type) {
+                    case 'Chargement': return 'fas fa-upload';
+                    case 'Déchargement': return 'fas fa-download';
+                    case 'Transbordement': return 'fas fa-exchange-alt';
+                    case 'Stockage': return 'fas fa-warehouse';
+                    case 'Manutention': return 'fas fa-hands-helping';
+                    case 'Inspection': return 'fas fa-search';
+                    default: return 'fas fa-cogs';
+                }
+            };
+
+            // Modals
+            $scope.showEditModal = function() {
+                $scope.editForm = angular.copy($scope.operation);
+                if ($scope.editForm.DATE_debut) {
+                    $scope.editForm.DATE_debut = new Date($scope.editForm.DATE_debut).toISOString().slice(0, 16);
+                }
+                if ($scope.editForm.DATE_fin) {
+                    $scope.editForm.DATE_fin = new Date($scope.editForm.DATE_fin).toISOString().slice(0, 16);
+                }
+                const modal = new bootstrap.Modal(document.getElementById('editOperationModal'));
+                modal.show();
+            };
+
+            $scope.showAddPersonnelModal = function() {
+                console.log('📋 Ouverture modal personnel');
+                console.log('Personnel disponible:', $scope.availablePersonnel.length);
+                console.log('Sous-traitants disponibles:', $scope.availableSoustraitants.length);
+                
+                $scope.personnelForm.selected = null;
+                $scope.soustraitantForm.selected = null;
+                const modal = new bootstrap.Modal(document.getElementById('addPersonnelModal'));
+                modal.show();
+            };
+
+            $scope.showAddConteneurModal = function() {
+                $scope.conteneurForm.selected = null;
+                const modal = new bootstrap.Modal(document.getElementById('addConteneurModal'));
+                modal.show();
+            };
+
+            $scope.showAddEquipementModal = function() {
+                $scope.equipementForm.selected = null;
+                const modal = new bootstrap.Modal(document.getElementById('addEquipementModal'));
+                modal.show();
+            };
+
+            $scope.showAddArretModal = function() {
+                $scope.arretForm = {
+                    MOTIF_arret: '',
+                    DATE_DEBUT_arret: new Date().toISOString().slice(0, 16),
+                    DATE_FIN_arret: '',
+                    DURE_arret: 0
+                };
+                const modal = new bootstrap.Modal(document.getElementById('addArretModal'));
+                modal.show();
+            };
+
+            // Actions CRUD
+            $scope.updateOperation = function() {
+                $scope.operation = angular.copy($scope.editForm);
+                $scope.showAlert('Opération mise à jour avec succès', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editOperationModal')).hide();
+            };
+
+            $scope.addPersonnel = function() {
+                console.log('🏃 Ajout de personnel...');
+                console.log('Personnel sélectionné:', $scope.personnelForm.selected);
+                console.log('Sous-traitant sélectionné:', $scope.soustraitantForm.selected);
+                
+                let selectedPerson = null;
+                
+                if ($scope.personnelForm.selected) {
+                    selectedPerson = {
+                        matricule: $scope.personnelForm.selected.MATRICULE_personnel,
+                        nom: $scope.personnelForm.selected.NOM_personnel,
+                        prenom: $scope.personnelForm.selected.PRENOM_personnel,
+                        fonction: $scope.personnelForm.selected.FONCTION_personnel,
+                        contact: $scope.personnelForm.selected.CONTACT_personnel || '-',
+                        type: 'Personnel'
+                    };
+                } else if ($scope.soustraitantForm.selected) {
+                    selectedPerson = {
+                        matricule: $scope.soustraitantForm.selected.MATRICULE_soustraiteure,
+                        nom: $scope.soustraitantForm.selected.NOM_soustraiteure,
+                        prenom: $scope.soustraitantForm.selected.PRENOM_soustraiteure,
+                        fonction: $scope.soustraitantForm.selected.FONCTION_soustraiteure,
+                        contact: $scope.soustraitantForm.selected.CONTACT_soustraiteure || '-',
+                        type: 'Sous-traitant'
+                    };
+                }
+                
+                if (selectedPerson) {
+                    // Vérifier si déjà assigné
+                    const alreadyAssigned = $scope.personnel.some(p => p.matricule === selectedPerson.matricule);
+                    if (alreadyAssigned) {
+                        $scope.showAlert('Cette personne est déjà assignée à l\'opération', 'warning');
+                        return;
+                    }
+                    
+                    $scope.personnel.push(selectedPerson);
+                    $scope.updateStatistics();
+                    
+                    // Réinitialiser les formulaires
+                    $scope.personnelForm.selected = null;
+                    $scope.soustraitantForm.selected = null;
+                    
+                    $scope.showAlert('Personnel ajouté avec succès', 'success');
+                    
+                    // Fermer le modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addPersonnelModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    console.log('✅ Personnel ajouté:', selectedPerson);
+                } else {
+                    $scope.showAlert('Veuillez sélectionner un personnel ou un sous-traitant', 'warning');
+                }
+            };
+
+            $scope.addConteneur = function() {
+                if (!$scope.conteneurForm.selected) {
+                    $scope.showAlert('Veuillez sélectionner un conteneur', 'warning');
+                    return;
+                }
+                
+                // Vérifier si déjà assigné
+                const alreadyAssigned = $scope.conteneurs.some(c => c.ID_conteneure === $scope.conteneurForm.selected.ID_conteneure);
+                if (alreadyAssigned) {
+                    $scope.showAlert('Ce conteneur est déjà assigné à l\'opération', 'warning');
+                    return;
+                }
+                
+                const newConteneur = angular.copy($scope.conteneurForm.selected);
+                newConteneur.DATE_AJOUT = new Date().toISOString();
+                
+                $scope.conteneurs.push(newConteneur);
+                $scope.updateStatistics();
+                $scope.conteneurForm.selected = null;
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addConteneurModal'));
+                if (modal) modal.hide();
+                
+                $scope.showAlert('Conteneur ajouté avec succès', 'success');
+            };
+
+            $scope.addEquipement = function() {
+                if (!$scope.equipementForm.selected) {
+                    $scope.showAlert('Veuillez sélectionner un équipement', 'warning');
+                    return;
+                }
+                
+                // Vérifier si déjà assigné
+                const alreadyAssigned = $scope.equipements.some(e => e.ID_engin === $scope.equipementForm.selected.ID_engin);
+                if (alreadyAssigned) {
+                    $scope.showAlert('Cet équipement est déjà assigné à l\'opération', 'warning');
+                    return;
+                }
+                
+                $scope.equipements.push(angular.copy($scope.equipementForm.selected));
+                $scope.updateStatistics();
+                $scope.equipementForm.selected = null;
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addEquipementModal'));
+                if (modal) modal.hide();
+                
+                $scope.showAlert('Équipement ajouté avec succès', 'success');
+            };
+
+            $scope.addArret = function() {
+                if (!$scope.arretForm.MOTIF_arret || !$scope.arretForm.DATE_DEBUT_arret) {
+                    $scope.showAlert('Veuillez remplir tous les champs obligatoires', 'warning');
+                    return;
+                }
+
+                // Calculer la durée automatiquement si les deux dates sont fournies
+                if ($scope.arretForm.DATE_DEBUT_arret && $scope.arretForm.DATE_FIN_arret) {
+                    const debut = new Date($scope.arretForm.DATE_DEBUT_arret);
+                    const fin = new Date($scope.arretForm.DATE_FIN_arret);
+                    const dureeMinutes = Math.round((fin - debut) / 60000);
+                    $scope.arretForm.DURE_arret = dureeMinutes;
+                }
+
+                const newArret = {
+                    ID_arret: 'AR-' + (Date.now().toString().slice(-3)),
+                    MOTIF_arret: $scope.arretForm.MOTIF_arret,
+                    DATE_DEBUT_arret: $scope.arretForm.DATE_DEBUT_arret,
+                    DATE_FIN_arret: $scope.arretForm.DATE_FIN_arret || null,
+                    DURE_arret: $scope.arretForm.DURE_arret || 0
+                };
+
+                $scope.arrets.push(newArret);
+                $scope.updateStatistics();
+                $scope.showAlert('Arrêt déclaré avec succès', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('addArretModal')).hide();
+            };
+
+            // Actions de suppression
+            $scope.removePersonnel = function(person) {
+                if (confirm('Retirer ' + person.prenom + ' ' + person.nom + ' de l\'opération ?')) {
+                    $scope.personnel = $scope.personnel.filter(p => p.matricule !== person.matricule);
+                    $scope.updateStatistics();
+                    $scope.showAlert('Personnel retiré de l\'opération', 'success');
+                }
+            };
+
+            $scope.removeConteneur = function(conteneur) {
+                if (confirm('Retirer le conteneur ' + conteneur.ID_conteneure + ' de l\'opération ?')) {
+                    $scope.conteneurs = $scope.conteneurs.filter(c => c.ID_conteneure !== conteneur.ID_conteneure);
+                    $scope.updateStatistics();
+                    $scope.showAlert('Conteneur retiré de l\'opération', 'success');
+                }
+            };
+
+            $scope.removeEquipement = function(equipement) {
+                if (confirm('Retirer l\'équipement ' + equipement.NOM_engin + ' de l\'opération ?')) {
+                    $scope.equipements = $scope.equipements.filter(e => e.ID_engin !== equipement.ID_engin);
+                    $scope.updateStatistics();
+                    $scope.showAlert('Équipement retiré de l\'opération', 'success');
+                }
+            };
+
+            $scope.removeArret = function(arret) {
+                if (confirm('Supprimer cet arrêt ?')) {
+                    $scope.arrets = $scope.arrets.filter(a => a.ID_arret !== arret.ID_arret);
+                    $scope.updateStatistics();
+                    $scope.showAlert('Arrêt supprimé', 'success');
+                }
+            };
+
+            // Actions d'édition
+            $scope.editConteneur = function(conteneur) {
+                $scope.showAlert('Fonctionnalité d\'édition en développement', 'info');
+            };
+
+            $scope.editArret = function(arret) {
+                $scope.showAlert('Fonctionnalité d\'édition en développement', 'info');
+            };
+
+            // Export et utilitaires
+            $scope.exportData = function() {
+                const data = {
+                    operation: $scope.operation,
+                    personnel: $scope.personnel,
+                    conteneurs: $scope.conteneurs,
+                    equipements: $scope.equipements,
+                    arrets: $scope.arrets,
+                    statistics: $scope.statistics,
+                    export_date: new Date().toISOString()
+                };
+                
+                const jsonData = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'operation_' + $scope.operation.ID_operation + '_' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                $scope.showAlert('Données exportées avec succès', 'success');
+            };
+
+            // Système d'alertes
+            $scope.showAlert = function(message, type) {
+                $scope.alert = {
+                    show: true,
+                    type: type || 'info',
+                    message: message
+                };
+                
+                setTimeout(function() {
+                    $scope.hideAlert();
+                    if (!$scope.$phase) {
+                        $scope.$apply();
+                    }
+                }, 5000);
+            };
+
+            $scope.hideAlert = function() {
+                $scope.alert.show = false;
+            };
+
+            // Déconnexion
+            $scope.logout = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userInfo');
+                window.location.href = 'login.html';
+            };
+
+            // Initialisation automatique
+            $scope.init();
+            
+            // Force l'application du scope après l'initialisation
+            setTimeout(function() {
+                if (!$scope.$phase) {
+                    $scope.$apply();
+                }
+            }, 100);
+        }]);
+    </script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+       
+       <!-- ⭐ FICHIER JS SÉPARÉ ⭐ -->
+       <script src="js/operation-detail.js"></script>
+</body>
+</html>
